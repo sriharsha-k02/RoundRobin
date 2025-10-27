@@ -330,12 +330,7 @@
                 </div>
             </div>
 
-            <!-- Semifinal Matches Card -->
-            <div class="card">
-                <h2 style="margin-bottom: 16px;">🏆 Playoff Matches</h2>
-                <div id="semifinalContent"></div>
-            </div>
-
+       
             <!-- Check Remaining Matches Card -->
             <div class="card">
                 <h2 style="margin-bottom: 16px;">Check Remaining Matches</h2>
@@ -351,6 +346,13 @@
                 <div id="remainingMatchesBox" class="hidden"></div>
             </div>
 
+                 <!-- Semifinal Matches Card -->
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">🏆 Playoff Matches</h2>
+                <div id="semifinalContent"></div>
+            </div>
+
+
             <!-- Completed Matches Card -->
             <div class="card" id="completedMatchesCard">
                 <h2 style="margin-bottom: 16px;">Completed Matches (<span id="matchCount">0</span>)</h2>
@@ -364,7 +366,7 @@
 
     <script>
         const TEAM_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
-        const COLOR_NAMES = ['Red', 'Blue', 'Green', 'Orange', 'Purple', 'Pink', 'Teal', 'Coral'];
+        const COLOR_NAMES = ['Akhanda', 'OG', 'Bahubali', 'Race Gurram', 'Basha', 'Mirai', 'KGF', 'Saaho' ];
         
         let teams = [];
         let matches = [];
@@ -1108,9 +1110,7 @@
                                finalMatch.score1 + finalMatch.score2 +
                                thirdPlaceMatch.score1 + thirdPlaceMatch.score2;
             
-            // Average points per match
-            const avgPoints = (totalPoints / totalMatches).toFixed(1);
-
+           
             // Find highest scoring match
             const allMatches = [
                 ...matches,
@@ -1275,6 +1275,6 @@
             }
         });
     </script>
-    
+
 </body>
 </html>
