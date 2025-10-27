@@ -330,7 +330,6 @@
                 </div>
             </div>
 
-       
             <!-- Check Remaining Matches Card -->
             <div class="card">
                 <h2 style="margin-bottom: 16px;">Check Remaining Matches</h2>
@@ -346,21 +345,29 @@
                 <div id="remainingMatchesBox" class="hidden"></div>
             </div>
 
-                 <!-- Semifinal Matches Card -->
-            <div class="card">
-                <h2 style="margin-bottom: 16px;">🏆 Playoff Matches</h2>
-                <div id="semifinalContent"></div>
-            </div>
-
-
             <!-- Completed Matches Card -->
             <div class="card" id="completedMatchesCard">
-                <h2 style="margin-bottom: 16px;">Completed Matches (<span id="matchCount">0</span>)</h2>
-                <div id="matchesList"></div>
+                <div class="card-header" style="cursor: pointer;" onclick="toggleCompletedMatches()">
+                    <h2>Completed Matches (<span id="matchCount">0</span>)</h2>
+                    <span id="completedChevron">▼</span>
+                </div>
+                <div class="card-content" id="matchesList"></div>
+            </div>
+
+             <!-- Semifinal Matches Card -->
+            <div class="card" id="playoffCard">
+                <div class="card-header" id="playoffHeader" style="cursor: pointer;" onclick="togglePlayoff()">
+                    <h2>🏆 Playoff Matches</h2>
+                    <span id="playoffChevron">▼</span>
+                </div>
+                <div class="card-content" id="semifinalContent"></div>
             </div>
 
             <!-- Tournament Summary Card -->
-            <div id="tournamentSummarySection" class="hidden"></div>
+            <div class="card" id="tournamentSummaryCard" class="hidden">
+                <h2 style="margin-bottom: 16px;">🏆 Tournament Results & Statistics</h2>
+                <div id="tournamentSummaryContent"></div>
+            </div>
         </div>
     </div>
 
@@ -376,6 +383,8 @@
         let semifinal2 = null;
         let finalMatch = null;
         let thirdPlaceMatch = null;
+        let playoffMinimized = false;
+        let completedMatchesMinimized = false;
 
         // Load data on page load
         window.onload = function() {
@@ -1067,14 +1076,45 @@
                 });
         }
 
+        function togglePlayoff() {
+            playoffMinimized = !playoffMinimized;
+            const content = document.getElementById('semifinalContent');
+            const chevron = document.getElementById('playoffChevron');
+            
+            if (playoffMinimized) {
+                content.classList.add('hidden');
+                chevron.textContent = '▶';
+            } else {
+                content.classList.remove('hidden');
+                chevron.textContent = '▼';
+            }
+        }
+
+        function toggleCompletedMatches() {
+            completedMatchesMinimized = !completedMatchesMinimized;
+            const content = document.getElementById('matchesList');
+            const chevron = document.getElementById('completedChevron');
+            
+            if (completedMatchesMinimized) {
+                content.classList.add('hidden');
+                chevron.textContent = '▶';
+            } else {
+                content.classList.remove('hidden');
+                chevron.textContent = '▼';
+            }
+        }
+
         function updateTournamentSummary() {
-            const summarySection = document.getElementById('tournamentSummarySection');
+            const summaryCard = document.getElementById('tournamentSummaryCard');
+            const summaryContent = document.getElementById('tournamentSummaryContent');
             
             // Check if tournament is complete (final and third place matches done)
             if (!finalMatch || !thirdPlaceMatch) {
-                summarySection.classList.add('hidden');
+                summaryCard.classList.add('hidden');
                 return;
             }
+
+            summaryCard.classList.remove('hidden');
 
             // Get winners
             const champion = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
@@ -1110,7 +1150,10 @@
                                finalMatch.score1 + finalMatch.score2 +
                                thirdPlaceMatch.score1 + thirdPlaceMatch.score2;
             
-           
+            // Average points per game (each match has 2 games/scores, so divide by matches * 2)
+            //const totalGames = totalMatches * 2;
+            //const avgPointsPerGame = (totalPoints / totalGames).toFixed(1);
+
             // Find highest scoring match
             const allMatches = [
                 ...matches,
@@ -1125,90 +1168,83 @@
                 return total > maxTotal ? m : max;
             }, allMatches[0]);
 
-            summarySection.classList.remove('hidden');
-            summarySection.innerHTML = `
-                <div class="tournament-summary">
-                    <h2 style="text-align: center; font-size: 32px; margin-bottom: 10px;">🏆 Tournament Complete! 🏆</h2>
+            summaryContent.innerHTML = `
+                <div style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <h3 style="text-align: center; font-size: 28px; margin-bottom: 10px;">🏆 Tournament Complete! 🏆</h3>
                     <p style="text-align: center; opacity: 0.9; margin-bottom: 30px;">Congratulations to all participants!</p>
                     
                     <div class="trophy-podium">
                         <div class="podium-place first">
                             <div style="font-size: 48px; margin-bottom: 10px;">🥇</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">CHAMPION</div>
-                            <div style="font-size: 24px; font-weight: 700; color: ${championTeam?.color};">${champion}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9;">${championTeam?.playerName}</div>
+                            <div style="font-size: 24px; font-weight: 700; color: ${championTeam?.color}; word-wrap: break-word;">${champion}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${championTeam?.playerName}</div>
                         </div>
                         
                         <div class="podium-place second">
                             <div style="font-size: 40px; margin-bottom: 10px;">🥈</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">RUNNER-UP</div>
-                            <div style="font-size: 20px; font-weight: 700; color: ${runnerUpTeam?.color};">${runnerUp}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9;">${runnerUpTeam?.playerName}</div>
+                            <div style="font-size: 20px; font-weight: 700; color: ${runnerUpTeam?.color}; word-wrap: break-word;">${runnerUp}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${runnerUpTeam?.playerName}</div>
                         </div>
                         
                         <div class="podium-place third">
                             <div style="font-size: 36px; margin-bottom: 10px;">🥉</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">THIRD PLACE</div>
-                            <div style="font-size: 18px; font-weight: 700; color: ${thirdPlaceTeam?.color};">${thirdPlace}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9;">${thirdPlaceTeam?.playerName}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: ${thirdPlaceTeam?.color}; word-wrap: break-word;">${thirdPlace}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${thirdPlaceTeam?.playerName}</div>
                         </div>
                     </div>
 
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 20px; text-align: center;">📊 Tournament Statistics</h3>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 20px;">📊 Tournament Statistics</h3>
                     
-                    <div class="metric-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Total Matches</div>
-                            <div class="metric-value">${totalMatches}</div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Total Points Scored</div>
-                            <div class="metric-value">${totalPoints}</div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Avg Points/Match</div>
-                            <div class="metric-value">${avgPoints}</div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Most League Wins</div>
-                            <div class="metric-value" style="font-size: 18px; color: ${mostWins.color};">
-                                ${mostWins.colorName} (${mostWins.wins})
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Most League Points</div>
-                            <div class="metric-value" style="font-size: 18px; color: ${mostPoints.color};">
-                                ${mostPoints.colorName} (${mostPoints.pointsFor})
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Best Point Diff</div>
-                            <div class="metric-value" style="font-size: 18px; color: ${bestDiff.color};">
-                                ${bestDiff.colorName} (+${bestDiff.pointDiff})
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Highest Scoring Match</div>
-                            <div class="metric-value" style="font-size: 16px;">
-                                ${highestScoringMatch.team1} vs ${highestScoringMatch.team2}<br>
-                                <span style="font-size: 20px;">${highestScoringMatch.score1 + highestScoringMatch.score2} pts</span>
-                            </div>
-                        </div>
-                        
-                        <div class="metric-card">
-                            <div class="metric-label">Teams Participated</div>
-                            <div class="metric-value">${teams.length}</div>
-                        </div>
-                    </div>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Matches Played</td>
+                                <td><strong>${totalMatches}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Total Points Scored</td>
+                                <td><strong>${totalPoints}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Average Points per Game</td>
+                                <td><strong>${avgPointsPerGame}</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Most League Wins</td>
+                                <td><strong style="color: ${mostWins.color};">${mostWins.colorName}</strong> (${mostWins.wins} wins)</td>
+                            </tr>
+                            <tr>
+                                <td>Most League Points</td>
+                                <td><strong style="color: ${mostPoints.color};">${mostPoints.colorName}</strong> (${mostPoints.pointsFor} points)</td>
+                            </tr>
+                            <tr>
+                                <td>Best Point Differential</td>
+                                <td><strong style="color: ${bestDiff.color};">${bestDiff.colorName}</strong> (+${bestDiff.pointDiff})</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Scoring Match</td>
+                                <td><strong>${highestScoringMatch.team1} vs ${highestScoringMatch.team2}</strong><br>
+                                    ${highestScoringMatch.score1}-${highestScoringMatch.score2} (${highestScoringMatch.score1 + highestScoringMatch.score2} total points)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Teams Participated</td>
+                                <td><strong>${teams.length}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                    <div style="text-align: center;">
-                        <button class="minimize-btn" onclick="minimizeAllAndShowSummary()">
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="minimize-btn" onclick="minimizeAllSections()">
                             ▲ Minimize All Sections
                         </button>
                     </div>
@@ -1216,42 +1252,32 @@
             `;
         }
 
-        function minimizeAllAndShowSummary() {
+        function minimizeAllSections() {
             // Minimize setup
-            if (setupComplete) {
+            if (setupComplete && !setupMinimized) {
                 document.getElementById('setupContent').classList.add('hidden');
                 document.getElementById('chevron').textContent = '▼';
                 setupMinimized = true;
             }
 
-            // Scroll to summary
-            document.getElementById('tournamentSummarySection').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
+            // Minimize playoff
+            if (!playoffMinimized) {
+                document.getElementById('semifinalContent').classList.add('hidden');
+                document.getElementById('playoffChevron').textContent = '▶';
+                playoffMinimized = true;
+            }
 
-            // Add collapsible functionality to all cards
-            const cards = ['completedMatchesCard'];
-            cards.forEach(cardId => {
-                const card = document.getElementById(cardId);
-                if (card && !card.dataset.collapsible) {
-                    card.dataset.collapsible = 'true';
-                    const header = card.querySelector('h2');
-                    header.style.cursor = 'pointer';
-                    header.innerHTML += ' <span style="float: right;">▼</span>';
-                    
-                    header.onclick = function() {
-                        const content = card.querySelector('div');
-                        const chevron = header.querySelector('span');
-                        if (content.style.display === 'none') {
-                            content.style.display = 'block';
-                            chevron.textContent = '▼';
-                        } else {
-                            content.style.display = 'none';
-                            chevron.textContent = '▶';
-                        }
-                    };
-                }
+            // Minimize completed matches
+            if (!completedMatchesMinimized) {
+                document.getElementById('matchesList').classList.add('hidden');
+                document.getElementById('completedChevron').textContent = '▶';
+                completedMatchesMinimized = true;
+            }
+
+            // Scroll to summary
+            document.getElementById('tournamentSummaryCard').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
             });
         }
 
@@ -1275,6 +1301,5 @@
             }
         });
     </script>
-
 </body>
 </html>
