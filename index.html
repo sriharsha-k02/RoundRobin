@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏸 Badminton Tournament Tracker</title>
+    <title>🏸 ShuttleSquad Tournament Tracker</title>
     <style>
         * {
             margin: 0;
@@ -329,16 +329,7 @@
                 </div>
             </div>
 
-            <!-- Semifinal Matches Card -->
-            <div class="card" id="playoffCard">
-                <div class="card-header" id="playoffHeader" style="cursor: pointer;" onclick="togglePlayoff()">
-                    <h2>🏆 Playoff Matches</h2>
-                    <span id="playoffChevron">▼</span>
-                </div>
-                <div class="card-content" id="semifinalContent"></div>
-            </div>
-
-            <!-- Check Remaining Matches Card -->
+              <!-- Check Remaining Matches Card -->
             <div class="card">
                 <h2 style="margin-bottom: 16px;">Check Remaining Matches</h2>
                 <div class="flex-row">
@@ -353,13 +344,22 @@
                 <div id="remainingMatchesBox" class="hidden"></div>
             </div>
 
-            <!-- Completed Matches Card -->
+              <!-- Completed Matches Card -->
             <div class="card" id="completedMatchesCard">
                 <div class="card-header" style="cursor: pointer;" onclick="toggleCompletedMatches()">
                     <h2>Completed Matches (<span id="matchCount">0</span>)</h2>
                     <span id="completedChevron">▼</span>
                 </div>
                 <div class="card-content" id="matchesList"></div>
+            </div>
+
+            <!-- Semifinal Matches Card -->
+            <div class="card" id="playoffCard">
+                <div class="card-header" id="playoffHeader" style="cursor: pointer;" onclick="togglePlayoff()">
+                    <h2>🏆 Playoff Matches</h2>
+                    <span id="playoffChevron">▼</span>
+                </div>
+                <div class="card-content" id="semifinalContent"></div>
             </div>
 
             <!-- Tournament Summary Card -->
@@ -1297,22 +1297,22 @@
                         <div class="podium-place first">
                             <div style="font-size: 48px; margin-bottom: 10px;">🥇</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">CHAMPION</div>
-                            <div style="font-size: 24px; font-weight: 700; color: ${championTeam?.color}; word-wrap: break-word;">${champion}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${championTeam?.playerName}</div>
+                            <div style="font-size: 24px; font-weight: 700; color: ${championTeam?.playerName}; word-wrap: break-word;">${champion}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${championTeam?.color}</div>
                         </div>
                         
                         <div class="podium-place second">
                             <div style="font-size: 40px; margin-bottom: 10px;">🥈</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">RUNNER-UP</div>
-                            <div style="font-size: 20px; font-weight: 700; color: ${runnerUpTeam?.color}; word-wrap: break-word;">${runnerUp}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${runnerUpTeam?.playerName}</div>
+                            <div style="font-size: 20px; font-weight: 700; color: ${runnerUpTeam?.playerName}; word-wrap: break-word;">${runnerUp}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${runnerUpTeam?.color}</div>
                         </div>
                         
                         <div class="podium-place third">
                             <div style="font-size: 36px; margin-bottom: 10px;">🥉</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">THIRD PLACE</div>
-                            <div style="font-size: 18px; font-weight: 700; color: ${thirdPlaceTeam?.color}; word-wrap: break-word;">${thirdPlace}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${thirdPlaceTeam?.playerName}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: ${thirdPlaceTeam?.playerName}; word-wrap: break-word;">${thirdPlace}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${thirdPlaceTeam?.color}</div>
                         </div>
                     </div>
 
