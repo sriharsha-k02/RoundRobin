@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -257,6 +258,95 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Stats Table Styles */
+        .stats-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 10px;
+        }
+        
+        .stats-table th {
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            font-size: 12px;
+            padding: 0 10px;
+        }
+        
+        .stats-table td {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 10px;
+            color: white;
+        }
+        
+        .stats-table tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .stats-table tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            text-align: right;
+        }
+
+        .trophy-podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .podium-place {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .podium-place.first {
+            height: 220px;
+            width: 140px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            order: 2;
+        }
+        
+        .podium-place.second {
+            height: 180px;
+            width: 120px;
+            background: rgba(192, 192, 192, 0.2);
+            border: 2px solid rgba(192, 192, 192, 0.5);
+            order: 1;
+        }
+        
+        .podium-place.third {
+            height: 160px;
+            width: 120px;
+            background: rgba(205, 127, 50, 0.2);
+            border: 2px solid rgba(205, 127, 50, 0.5);
+            order: 3;
+        }
+
+        .minimize-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .minimize-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
     </style>
 </head>
 <body>
@@ -266,7 +356,6 @@
             <button id="resetBtn" class="btn-gray hidden" onclick="resetTournament()">Reset Tournament</button>
         </div>
 
-        <!-- Team Setup Card -->
         <div class="card">
             <div class="card-header" id="setupHeader">
                 <h2>
@@ -286,10 +375,8 @@
             </div>
         </div>
 
-        <!-- Tournament Section -->
         <div id="tournamentSection" class="hidden">
             <div class="grid-2">
-                <!-- Add Match Card -->
                 <div class="card">
                     <h2 style="margin-bottom: 16px;">Add Match Result</h2>
                     <label>Team 1</label>
@@ -308,7 +395,6 @@
                     <div id="matchError" class="error hidden"></div>
                 </div>
 
-                <!-- Leaderboard Card -->
                 <div class="card">
                     <h2 style="margin-bottom: 16px;">Leaderboard</h2>
                     <div style="overflow-x: auto;">
@@ -328,8 +414,7 @@
                 </div>
             </div>
 
-              <!-- Check Remaining Matches Card -->
-            <div class="card">
+              <div class="card">
                 <h2 style="margin-bottom: 16px;">Check Remaining Matches</h2>
                 <div class="flex-row">
                     <div class="flex-1">
@@ -343,8 +428,7 @@
                 <div id="remainingMatchesBox" class="hidden"></div>
             </div>
 
-              <!-- Completed Matches Card -->
-            <div class="card" id="completedMatchesCard">
+              <div class="card" id="completedMatchesCard">
                 <div class="card-header" style="cursor: pointer;" onclick="toggleCompletedMatches()">
                     <h2>Completed Matches (<span id="matchCount">0</span>)</h2>
                     <span id="completedChevron">▼</span>
@@ -352,7 +436,6 @@
                 <div class="card-content" id="matchesList"></div>
             </div>
 
-            <!-- Semifinal Matches Card -->
             <div class="card" id="playoffCard">
                 <div class="card-header" id="playoffHeader" style="cursor: pointer;" onclick="togglePlayoff()">
                     <h2>🏆 Playoff Matches</h2>
@@ -361,7 +444,6 @@
                 <div class="card-content" id="semifinalContent"></div>
             </div>
 
-            <!-- Tournament Summary Card -->
             <div class="card" id="tournamentSummaryCard" class="hidden">
                 <h2 style="margin-bottom: 16px;">🏆 Tournament Results & Statistics</h2>
                 <div id="tournamentSummaryContent"></div>
@@ -424,13 +506,13 @@
             const section = document.getElementById('teamInputsSection');
             section.classList.remove('hidden');
             
-            let html = '<h3 style="font-size: 16px; margin-bottom: 16px; color: #374151;">Enter Player Names</h3>';
+            let html = '<h3 style="font-size: 16px; margin-bottom: 16px; color: #374151;">Enter Team/Player Names</h3>';
             teams.forEach(team => {
                 html += `
                     <div class="team-input">
                         <label style="color: ${team.color};">Team ${team.colorName}</label>
                         <input type="text" maxlength="16" id="player_${team.id}" 
-                               placeholder="Enter player name (max 16 chars)" 
+                               placeholder="Enter Team Name (max 16 chars)" 
                                style="border-color: ${team.color};">
                     </div>
                 `;
@@ -449,7 +531,7 @@
             });
 
             if (!allFilled) {
-                showError('setupError', 'Please fill in all player names');
+                showError('setupError', 'Please fill in all player/team names');
                 return;
             }
 
@@ -499,7 +581,7 @@
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 const options = teams.map(t => 
-                    `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`
+                    `<option value="${t.colorName}">${t.playerName} (${t.colorName})</option>`
                 ).join('');
                 select.innerHTML = `<option value="">${selectId === 'remainingTeamSelect' ? 'Choose a team' : 'Select team'}</option>${options}`;
             });
@@ -525,6 +607,13 @@
                 showError('matchError', 'Please enter valid scores');
                 return;
             }
+            
+            // --- NEW VALIDATION: Check for ties ---
+            if (score1 === score2) {
+                showError('matchError', 'Ties are not allowed. Please play until there is a winner.');
+                return;
+            }
+            // --------------------------------------
 
             const matchExists = matches.some(m => 
                 (m.team1 === team1 && m.team2 === team2) ||
@@ -538,7 +627,7 @@
 
             matches.push({
                 id: Date.now(),
-                team1,
+                team1, // Storing colorName for ID stability
                 team2,
                 score1,
                 score2
@@ -611,8 +700,8 @@
             tbody.innerHTML = leaderboard.map(team => `
                 <tr>
                     <td>
-                        <span style="color: ${team.color}; font-weight: 600;">${team.colorName}</span>
-                        <span style="color: #6B7280; font-size: 12px; margin-left: 4px;">(${team.playerName})</span>
+                        <span style="color: ${team.color}; font-weight: 600;">${team.playerName}</span>
+                        <span style="color: #6B7280; font-size: 12px; margin-left: 4px;">(${team.colorName})</span>
                     </td>
                     <td class="text-center">${team.played}</td>
                     <td class="text-center" style="font-weight: 600; color: #10B981;">${team.wins}</td>
@@ -639,11 +728,11 @@
                 return `
                     <div class="match-item">
                         <div style="font-size: 14px;">
-                            <span style="color: ${t1?.color}; font-weight: 600;">${match.team1}</span>
+                            <span style="color: ${t1?.color}; font-weight: 600;">${t1?.playerName}</span>
                             <span style="margin: 0 8px; font-weight: 600;">(${match.score1})</span>
                             <span style="color: #6B7280;">vs</span>
                             <span style="margin: 0 8px; font-weight: 600;">(${match.score2})</span>
-                            <span style="color: ${t2?.color}; font-weight: 600;">${match.team2}</span>
+                            <span style="color: ${t2?.color}; font-weight: 600;">${t2?.playerName}</span>
                         </div>
                         <button class="btn-danger" onclick="cancelMatch(${match.id})" title="Cancel match">✕</button>
                     </div>
@@ -668,11 +757,13 @@
             const box = document.getElementById('remainingMatchesBox');
             box.classList.remove('hidden');
 
+            const selectedTeamName = teams.find(t => t.colorName === selectedTeam)?.playerName;
+
             if (remaining.length === 0) {
                 box.innerHTML = `
                     <div class="remaining-box">
                         <h3 style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">
-                            ${selectedTeam} needs to play against:
+                            ${selectedTeamName} needs to play against:
                         </h3>
                         <p style="color: #10B981; font-weight: 600; font-size: 14px;">✓ All matches completed!</p>
                     </div>
@@ -680,14 +771,14 @@
             } else {
                 const list = remaining.map(team => 
                     `<li style="color: ${team.color}; font-weight: 600; font-size: 14px; margin-bottom: 4px;">
-                        ${team.colorName} (${team.playerName})
+                        ${team.playerName} <span style="font-size:12px; opacity:0.7">(${team.colorName})</span>
                     </li>`
                 ).join('');
                 
                 box.innerHTML = `
                     <div class="remaining-box">
                         <h3 style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">
-                            ${selectedTeam} needs to play against:
+                            ${selectedTeamName} needs to play against:
                         </h3>
                         <ul style="margin: 0; padding-left: 20px;">${list}</ul>
                     </div>
@@ -728,17 +819,17 @@
 
             // Show Final Match if exists
             if (finalMatch) {
-                html += renderMatchResult(finalMatch, 'final', '🏆 Final Match', 'final');
+                html += renderMatchResult(finalMatch, 'final', '🏆 Final Match');
             }
 
             // Show Third Place Match if exists
             if (thirdPlaceMatch) {
-                html += renderMatchResult(thirdPlaceMatch, 'third-place', '🥉 Third Place Match', 'thirdPlace');
+                html += renderMatchResult(thirdPlaceMatch, 'third-place', '🥉 Third Place Match');
             }
 
             // Semifinal 1
             if (semifinal1) {
-                html += renderMatchResult(semifinal1, '', '⚔️ Semifinal Match 1', 'semifinal1');
+                html += renderMatchResult(semifinal1, '', '⚔️ Semifinal Match 1');
             } else if (hasClearTop4) {
                 html += renderSemifinalInput('semifinal1', 'Semifinal Match 1', top4[0], top4[3]);
             } else {
@@ -747,7 +838,7 @@
 
             // Semifinal 2
             if (semifinal2) {
-                html += renderMatchResult(semifinal2, '', '⚔️ Semifinal Match 2', 'semifinal2');
+                html += renderMatchResult(semifinal2, '', '⚔️ Semifinal Match 2');
             } else if (hasClearTop4) {
                 html += renderSemifinalInput('semifinal2', 'Semifinal Match 2', top4[1], top4[2]);
             } else {
@@ -767,43 +858,31 @@
             content.innerHTML = html || '<p class="no-matches">Complete round robin matches to start playoffs</p>';
         }
 
-        function editMatch(matchType) {
-            if (matchType === 'semifinal1') {
-                semifinal1 = null;
-                localStorage.removeItem('semifinal1');
-            } else if (matchType === 'semifinal2') {
-                semifinal2 = null;
-                localStorage.removeItem('semifinal2');
-            } else if (matchType === 'final') {
-                finalMatch = null;
-                localStorage.removeItem('finalMatch');
-            } else if (matchType === 'thirdPlace') {
-                thirdPlaceMatch = null;
-                localStorage.removeItem('thirdPlaceMatch');
-            }
-            
-            updatePlayoffSection();
-            updateTournamentSummary();
-        }
-
         function renderMatchResult(match, extraClass, title) {
             const t1 = teams.find(t => t.colorName === match.team1);
             const t2 = teams.find(t => t.colorName === match.team2);
             const winner = match.score1 > match.score2 ? match.team1 : match.team2;
+            const winnerTeam = teams.find(t => t.colorName === winner);
             const winnerColor = match.score1 > match.score2 ? t1?.color : t2?.color;
             
             return `
                 <div class="match-result ${extraClass}">
                     <h3 style="margin-bottom: 12px; font-size: 18px;">${title}</h3>
                     <div class="match-vs">
-                        <span style="color: ${t1?.color}; ${match.score1 > match.score2 ? 'font-size: 22px;' : ''}">${match.team1}</span>
+                        <div style="text-align: center;">
+                             <div style="color: ${t1?.color}; font-size: ${match.score1 > match.score2 ? '22px' : '18px'}; font-weight: bold;">${t1?.playerName}</div>
+                             <div style="font-size: 12px; color: #6B7280;">${t1?.colorName}</div>
+                        </div>
                         <span style="background: white; padding: 4px 12px; border-radius: 6px;">${match.score1}</span>
                         <span style="color: #6B7280;">vs</span>
                         <span style="background: white; padding: 4px 12px; border-radius: 6px;">${match.score2}</span>
-                        <span style="color: ${t2?.color}; ${match.score2 > match.score1 ? 'font-size: 22px;' : ''}">${match.team2}</span>
+                        <div style="text-align: center;">
+                             <div style="color: ${t2?.color}; font-size: ${match.score2 > match.score1 ? '22px' : '18px'}; font-weight: bold;">${t2?.playerName}</div>
+                             <div style="font-size: 12px; color: #6B7280;">${t2?.colorName}</div>
+                        </div>
                     </div>
                     <p style="text-align: center; margin-top: 8px; color: ${winnerColor}; font-weight: 600;">
-                        🏆 Winner: ${winner}
+                        🏆 Winner: ${winnerTeam?.playerName}
                     </p>
                 </div>
             `;
@@ -815,22 +894,22 @@
                     <h3>⚔️ ${title}</h3>
                     <div class="match-vs">
                         <div style="text-align: center;">
-                            <div style="color: ${team1.color}; font-size: 18px;">${team1.colorName}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${team1.playerName}</div>
+                            <div style="color: ${team1.color}; font-size: 20px; font-weight: bold;">${team1.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${team1.colorName}</div>
                         </div>
                         <span style="color: #6B7280;">vs</span>
                         <div style="text-align: center;">
-                            <div style="color: ${team2.color}; font-size: 18px;">${team2.colorName}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${team2.playerName}</div>
+                            <div style="color: ${team2.color}; font-size: 20px; font-weight: bold;">${team2.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${team2.colorName}</div>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
                         <div>
-                            <label>Score ${team1.colorName}</label>
+                            <label>Score ${team1.playerName}</label>
                             <input type="number" id="${matchId}_score1" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                         <div>
-                            <label>Score ${team2.colorName}</label>
+                            <label>Score ${team2.playerName}</label>
                             <input type="number" id="${matchId}_score2" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                     </div>
@@ -853,14 +932,14 @@
                             <label>Team 1</label>
                             <select id="${matchId}_team1" style="margin-bottom: 0;">
                                 <option value="">Select team</option>
-                                ${teams.map(t => `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`).join('')}
+                                ${teams.map(t => `<option value="${t.colorName}">${t.playerName} (${t.colorName})</option>`).join('')}
                             </select>
                         </div>
                         <div>
                             <label>Team 2</label>
                             <select id="${matchId}_team2" style="margin-bottom: 0;">
                                 <option value="">Select team</option>
-                                ${teams.map(t => `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`).join('')}
+                                ${teams.map(t => `<option value="${t.colorName}">${t.playerName} (${t.colorName})</option>`).join('')}
                             </select>
                         </div>
                     </div>
@@ -892,22 +971,22 @@
                     <h3>🏆 Final Match</h3>
                     <div class="match-vs">
                         <div style="text-align: center;">
-                            <div style="color: ${w1Team?.color}; font-size: 18px;">${winner1}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${w1Team?.playerName}</div>
+                            <div style="color: ${w1Team?.color}; font-size: 20px; font-weight: bold;">${w1Team?.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${w1Team?.colorName}</div>
                         </div>
                         <span style="color: #6B7280;">vs</span>
                         <div style="text-align: center;">
-                            <div style="color: ${w2Team?.color}; font-size: 18px;">${winner2}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${w2Team?.playerName}</div>
+                            <div style="color: ${w2Team?.color}; font-size: 20px; font-weight: bold;">${w2Team?.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${w2Team?.colorName}</div>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
                         <div>
-                            <label>Score ${winner1}</label>
+                            <label>Score ${w1Team?.playerName}</label>
                             <input type="number" id="final_score1" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                         <div>
-                            <label>Score ${winner2}</label>
+                            <label>Score ${w2Team?.playerName}</label>
                             <input type="number" id="final_score2" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                     </div>
@@ -916,22 +995,22 @@
                     <h3>🥉 Third Place Match</h3>
                     <div class="match-vs">
                         <div style="text-align: center;">
-                            <div style="color: ${l1Team?.color}; font-size: 18px;">${loser1}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${l1Team?.playerName}</div>
+                            <div style="color: ${l1Team?.color}; font-size: 20px; font-weight: bold;">${l1Team?.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${l1Team?.colorName}</div>
                         </div>
                         <span style="color: #6B7280;">vs</span>
                         <div style="text-align: center;">
-                            <div style="color: ${l2Team?.color}; font-size: 18px;">${loser2}</div>
-                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${l2Team?.playerName}</div>
+                            <div style="color: ${l2Team?.color}; font-size: 20px; font-weight: bold;">${l2Team?.playerName}</div>
+                            <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">${l2Team?.colorName}</div>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
                         <div>
-                            <label>Score ${loser1}</label>
+                            <label>Score ${l1Team?.playerName}</label>
                             <input type="number" id="third_score1" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                         <div>
-                            <label>Score ${loser2}</label>
+                            <label>Score ${l2Team?.playerName}</label>
                             <input type="number" id="third_score2" min="0" placeholder="0" style="margin-bottom: 0;">
                         </div>
                     </div>
@@ -1069,89 +1148,6 @@
             updateTournamentSummary();
         }
 
-        function saveFinal(team1, team2) {
-            const score1 = parseInt(document.getElementById('final_score1').value);
-            const score2 = parseInt(document.getElementById('final_score2').value);
-
-            if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
-                alert('Please enter valid scores');
-                return;
-            }
-
-            if (score1 === score2) {
-                alert('Scores cannot be tied in playoff matches');
-                return;
-            }
-
-            finalMatch = {
-                team1,
-                team2,
-                score1,
-                score2
-            };
-
-            localStorage.setItem('finalMatch', JSON.stringify(finalMatch));
-            
-            // Don't update playoff section yet - wait for third place match
-            // Just clear the input fields
-            document.getElementById('final_score1').value = '';
-            document.getElementById('final_score2').value = '';
-            
-            // If third place is also filled, then update
-            const thirdScore1 = document.getElementById('third_score1')?.value;
-            const thirdScore2 = document.getElementById('third_score2')?.value;
-            
-            if (thirdScore1 && thirdScore2) {
-                // Both are filled, update everything
-                updatePlayoffSection();
-                updateTournamentSummary();
-            } else {
-                // Show success message but keep the form visible
-                alert('Final match saved! Please enter the Third Place match score.');
-            }
-        }
-
-        function saveThirdPlace(team1, team2) {
-            const score1 = parseInt(document.getElementById('third_score1').value);
-            const score2 = parseInt(document.getElementById('third_score2').value);
-
-            if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
-                alert('Please enter valid scores');
-                return;
-            }
-
-            if (score1 === score2) {
-                alert('Scores cannot be tied in playoff matches');
-                return;
-            }
-
-            thirdPlaceMatch = {
-                team1,
-                team2,
-                score1,
-                score2
-            };
-
-            localStorage.setItem('thirdPlaceMatch', JSON.stringify(thirdPlaceMatch));
-            
-            // Don't update playoff section yet - wait for final match if not filled
-            document.getElementById('third_score1').value = '';
-            document.getElementById('third_score2').value = '';
-            
-            // If final is also filled, then update
-            const finalScore1 = document.getElementById('final_score1')?.value;
-            const finalScore2 = document.getElementById('final_score2')?.value;
-            
-            if (finalScore1 && finalScore2) {
-                // Both are filled, update everything
-                updatePlayoffSection();
-                updateTournamentSummary();
-            } else {
-                // Show success message but keep the form visible
-                alert('Third Place match saved! Please enter the Final match score.');
-            }
-        }
-
         function getLeaderboardData() {
             const stats = teams.map(team => ({
                 ...team,
@@ -1256,9 +1252,6 @@
             // Best point differential
             const bestDiff = leaderboard.reduce((max, team) => team.pointDiff > max.pointDiff ? team : max, leaderboard[0]);
             
-            // Most matches played
-            const mostPlayed = leaderboard.reduce((max, team) => team.played > max.played ? team : max, leaderboard[0]);
-            
             // Total matches
             const totalMatches = matches.length + 3; // Round robin + 2 semifinals + final + third place
             
@@ -1287,6 +1280,9 @@
                 return total > maxTotal ? m : max;
             }, allMatches[0]);
 
+            const highMatchT1 = teams.find(t => t.colorName === highestScoringMatch.team1);
+            const highMatchT2 = teams.find(t => t.colorName === highestScoringMatch.team2);
+
             summaryContent.innerHTML = `
                 <div style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                     <h3 style="text-align: center; font-size: 28px; margin-bottom: 10px;">🏆 Tournament Complete! 🏆</h3>
@@ -1296,22 +1292,22 @@
                         <div class="podium-place first">
                             <div style="font-size: 48px; margin-bottom: 10px;">🥇</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">CHAMPION</div>
-                            <div style="font-size: 24px; font-weight: 700; color: ${championTeam?.playerName}; word-wrap: break-word;">${champion}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${championTeam?.color}</div>
+                            <div style="font-size: 20px; font-weight: 700; color: white; word-wrap: break-word;">${championTeam?.playerName}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${champion} Team</div>
                         </div>
                         
                         <div class="podium-place second">
                             <div style="font-size: 40px; margin-bottom: 10px;">🥈</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">RUNNER-UP</div>
-                            <div style="font-size: 20px; font-weight: 700; color: ${runnerUpTeam?.playerName}; word-wrap: break-word;">${runnerUp}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${runnerUpTeam?.color}</div>
+                            <div style="font-size: 18px; font-weight: 700; color: white; word-wrap: break-word;">${runnerUpTeam?.playerName}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${runnerUp} Team</div>
                         </div>
                         
                         <div class="podium-place third">
                             <div style="font-size: 36px; margin-bottom: 10px;">🥉</div>
                             <div style="font-size: 12px; font-weight: 600; opacity: 0.8; margin-bottom: 5px;">THIRD PLACE</div>
-                            <div style="font-size: 18px; font-weight: 700; color: ${thirdPlaceTeam?.playerName}; word-wrap: break-word;">${thirdPlace}</div>
-                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${thirdPlaceTeam?.color}</div>
+                            <div style="font-size: 16px; font-weight: 700; color: white; word-wrap: break-word;">${thirdPlaceTeam?.playerName}</div>
+                            <div style="font-size: 14px; margin-top: 5px; opacity: 0.9; word-wrap: break-word;">${thirdPlace} Team</div>
                         </div>
                     </div>
 
@@ -1339,19 +1335,19 @@
                             </tr>
                             <tr>
                                 <td>Most League Wins</td>
-                                <td><strong style="color: ${mostWins.color};">${mostWins.colorName}</strong> (${mostWins.wins} wins)</td>
+                                <td><strong style="color: ${mostWins.color};">${mostWins.playerName}</strong> (${mostWins.wins} wins)</td>
                             </tr>
                             <tr>
                                 <td>Most League Points</td>
-                                <td><strong style="color: ${mostPoints.color};">${mostPoints.colorName}</strong> (${mostPoints.pointsFor} points)</td>
+                                <td><strong style="color: ${mostPoints.color};">${mostPoints.playerName}</strong> (${mostPoints.pointsFor} points)</td>
                             </tr>
                             <tr>
                                 <td>Best Point Differential</td>
-                                <td><strong style="color: ${bestDiff.color};">${bestDiff.colorName}</strong> (+${bestDiff.pointDiff})</td>
+                                <td><strong style="color: ${bestDiff.color};">${bestDiff.playerName}</strong> (+${bestDiff.pointDiff})</td>
                             </tr>
                             <tr>
                                 <td>Highest Scoring Match</td>
-                                <td><strong>${highestScoringMatch.team1} vs ${highestScoringMatch.team2}</strong><br>
+                                <td><strong>${highMatchT1?.playerName} vs ${highMatchT2?.playerName}</strong><br>
                                     ${highestScoringMatch.score1}-${highestScoringMatch.score2} (${highestScoringMatch.score1 + highestScoringMatch.score2} total points)
                                 </td>
                             </tr>
@@ -1384,138 +1380,35 @@
             
             // Winners
             csv += 'FINAL STANDINGS\n';
-            csv += 'Position,Team,Player Name\n';
-            csv += `Champion,${champion},${teams.find(t => t.colorName === champion)?.playerName}\n`;
-            csv += `Runner-Up,${runnerUp},${teams.find(t => t.colorName === runnerUp)?.playerName}\n`;
-            csv += `Third Place,${thirdPlace},${teams.find(t => t.colorName === thirdPlace)?.playerName}\n`;
-            csv += '\n';
-            
-            // Leaderboard
-            csv += 'LEAGUE STAGE STANDINGS\n';
-            csv += 'Rank,Team,Player Name,Matches Played,Wins,Losses,Points For,Points Against,Point Difference\n';
-            leaderboard.forEach((team, idx) => {
-                csv += `${idx + 1},${team.colorName},${team.playerName},${team.played},${team.wins},${team.losses},${team.pointsFor},${team.pointsAgainst},${team.pointDiff}\n`;
-            });
-            csv += '\n';
-            
-            // All Matches
-            csv += 'ALL MATCHES\n';
-            csv += 'Match Type,Team 1,Player 1,Score 1,Team 2,Player 2,Score 2,Winner\n';
-            
-            // Round Robin
-            matches.forEach(match => {
-                const t1 = teams.find(t => t.colorName === match.team1);
-                const t2 = teams.find(t => t.colorName === match.team2);
-                const winner = match.score1 > match.score2 ? match.team1 : match.team2;
-                csv += `Round Robin,${match.team1},${t1?.playerName},${match.score1},${match.team2},${t2?.playerName},${match.score2},${winner}\n`;
-            });
-            
-            // Semifinals
-            if (semifinal1) {
-                const t1 = teams.find(t => t.colorName === semifinal1.team1);
-                const t2 = teams.find(t => t.colorName === semifinal1.team2);
-                const winner = semifinal1.score1 > semifinal1.score2 ? semifinal1.team1 : semifinal1.team2;
-                csv += `Semifinal 1,${semifinal1.team1},${t1?.playerName},${semifinal1.score1},${semifinal1.team2},${t2?.playerName},${semifinal1.score2},${winner}\n`;
-            }
-            
-            if (semifinal2) {
-                const t1 = teams.find(t => t.colorName === semifinal2.team1);
-                const t2 = teams.find(t => t.colorName === semifinal2.team2);
-                const winner = semifinal2.score1 > semifinal2.score2 ? semifinal2.team1 : semifinal2.team2;
-                csv += `Semifinal 2,${semifinal2.team1},${t1?.playerName},${semifinal2.score1},${semifinal2.team2},${t2?.playerName},${semifinal2.score2},${winner}\n`;
-            }
-            
-            // Third Place
-            if (thirdPlaceMatch) {
-                const t1 = teams.find(t => t.colorName === thirdPlaceMatch.team1);
-                const t2 = teams.find(t => t.colorName === thirdPlaceMatch.team2);
-                const winner = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
-                csv += `Third Place,${thirdPlaceMatch.team1},${t1?.playerName},${thirdPlaceMatch.score1},${thirdPlaceMatch.team2},${t2?.playerName},${thirdPlaceMatch.score2},${winner}\n`;
-            }
-            
-            // Final
-            if (finalMatch) {
-                const t1 = teams.find(t => t.colorName === finalMatch.team1);
-                const t2 = teams.find(t => t.colorName === finalMatch.team2);
-                const winner = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
-                csv += `Final,${finalMatch.team1},${t1?.playerName},${finalMatch.score1},${finalMatch.team2},${t2?.playerName},${finalMatch.score2},${winner}\n`;
-            }
-            
-            csv += '\n';
-            
-            // Statistics
-            const totalMatches = matches.length + 3;
-            const totalPoints = matches.reduce((sum, m) => sum + m.score1 + m.score2, 0) +
-                               (semifinal1 ? semifinal1.score1 + semifinal1.score2 : 0) +
-                               (semifinal2 ? semifinal2.score1 + semifinal2.score2 : 0) +
-                               finalMatch.score1 + finalMatch.score2 +
-                               thirdPlaceMatch.score1 + thirdPlaceMatch.score2;
-            const totalGames = totalMatches * 2;
-            const avgPointsPerGame = (totalPoints / totalGames).toFixed(1);
-            const mostWins = leaderboard.reduce((max, team) => team.wins > max.wins ? team : max, leaderboard[0]);
-            const mostPoints = leaderboard.reduce((max, team) => team.pointsFor > max.pointsFor ? team : max, leaderboard[0]);
-            
-            csv += 'TOURNAMENT STATISTICS\n';
-            csv += 'Metric,Value\n';
-            csv += `Total Matches Played,${totalMatches}\n`;
-            csv += `Total Points Scored,${totalPoints}\n`;
-            csv += `Average Points per Game,${avgPointsPerGame}\n`;
-            csv += `Most League Wins,${mostWins.colorName} (${mostWins.playerName}) - ${mostWins.wins} wins\n`;
-            csv += `Most League Points,${mostPoints.colorName} (${mostPoints.playerName}) - ${mostPoints.pointsFor} points\n`;
-            csv += `Teams Participated,${teams.length}\n`;
-            
-            // Download
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            const date = new Date().toISOString().split('T')[0];
-            link.setAttribute('href', url);
-            link.setAttribute('download', `badminton_tournament_${date}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function downloadCSV() {
-            const leaderboard = getLeaderboardData();
-            const champion = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
-            const runnerUp = finalMatch.score1 > finalMatch.score2 ? finalMatch.team2 : finalMatch.team1;
-            const thirdPlace = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
-            
-            let csv = 'BADMINTON TOURNAMENT RESULTS\n\n';
-            
-            // Winners
-            csv += 'FINAL STANDINGS\n';
-            csv += 'Position,Team,Player Name\n';
-            csv += `Champion,${champion},${teams.find(t => t.colorName === champion)?.playerName}\n`;
-            csv += `Runner-Up,${runnerUp},${teams.find(t => t.colorName === runnerUp)?.playerName}\n`;
-            csv += `Third Place,${thirdPlace},${teams.find(t => t.colorName === thirdPlace)?.playerName}\n`;
+            csv += 'Position,Team Name,Color Team\n';
+            csv += `Champion,${teams.find(t => t.colorName === champion)?.playerName},${champion}\n`;
+            csv += `Runner-Up,${teams.find(t => t.colorName === runnerUp)?.playerName},${runnerUp}\n`;
+            csv += `Third Place,${teams.find(t => t.colorName === thirdPlace)?.playerName},${thirdPlace}\n`;
             csv += '\n';
             
             // Leaderboard with match scores
             csv += 'LEAGUE STAGE STANDINGS\n';
-            csv += 'Rank,Team,Player Name,Matches Played,Wins,Losses,Points For,Points Against,Point Difference,Match Scores\n';
+            csv += 'Rank,Team Name,Color,Matches Played,Wins,Losses,Points For,Points Against,Point Difference,Match Scores\n';
             leaderboard.forEach((team, idx) => {
                 // Get all match scores for this team
                 const teamMatches = matches.filter(m => m.team1 === team.colorName || m.team2 === team.colorName);
                 const matchScores = teamMatches.map(m => {
                     if (m.team1 === team.colorName) {
                         const opponent = teams.find(t => t.colorName === m.team2);
-                        return `vs ${m.team2}(${opponent?.playerName}) ${m.score1}-${m.score2}`;
+                        return `vs ${opponent?.playerName} ${m.score1}-${m.score2}`;
                     } else {
                         const opponent = teams.find(t => t.colorName === m.team1);
-                        return `vs ${m.team1}(${opponent?.playerName}) ${m.score2}-${m.score1}`;
+                        return `vs ${opponent?.playerName} ${m.score2}-${m.score1}`;
                     }
                 }).join(' | ');
                 
-                csv += `${idx + 1},${team.colorName},${team.playerName},${team.played},${team.wins},${team.losses},${team.pointsFor},${team.pointsAgainst},${team.pointDiff},"${matchScores}"\n`;
+                csv += `${idx + 1},${team.playerName},${team.colorName},${team.played},${team.wins},${team.losses},${team.pointsFor},${team.pointsAgainst},${team.pointDiff},"${matchScores}"\n`;
             });
             csv += '\n';
             
             // All Matches
             csv += 'ALL MATCHES\n';
-            csv += 'Match Type,Team 1,Player 1,Score 1,Team 2,Player 2,Score 2,Winner,Winner Player\n';
+            csv += 'Match Type,Team 1 Name,Color 1,Score 1,Team 2 Name,Color 2,Score 2,Winner Name\n';
             
             // Round Robin
             matches.forEach((match, idx) => {
@@ -1523,66 +1416,41 @@
                 const t2 = teams.find(t => t.colorName === match.team2);
                 const winner = match.score1 > match.score2 ? match.team1 : match.team2;
                 const winnerPlayer = match.score1 > match.score2 ? t1?.playerName : t2?.playerName;
-                csv += `Round Robin ${idx + 1},${match.team1},${t1?.playerName},${match.score1},${match.team2},${t2?.playerName},${match.score2},${winner},${winnerPlayer}\n`;
+                csv += `Round Robin ${idx + 1},${t1?.playerName},${match.team1},${match.score1},${t2?.playerName},${match.team2},${match.score2},${winnerPlayer}\n`;
             });
             
             // Semifinals
             if (semifinal1) {
                 const t1 = teams.find(t => t.colorName === semifinal1.team1);
                 const t2 = teams.find(t => t.colorName === semifinal1.team2);
-                const winner = semifinal1.score1 > semifinal1.score2 ? semifinal1.team1 : semifinal1.team2;
                 const winnerPlayer = semifinal1.score1 > semifinal1.score2 ? t1?.playerName : t2?.playerName;
-                csv += `Semifinal 1,${semifinal1.team1},${t1?.playerName},${semifinal1.score1},${semifinal1.team2},${t2?.playerName},${semifinal1.score2},${winner},${winnerPlayer}\n`;
+                csv += `Semifinal 1,${t1?.playerName},${semifinal1.team1},${semifinal1.score1},${t2?.playerName},${semifinal1.team2},${semifinal1.score2},${winnerPlayer}\n`;
             }
             
             if (semifinal2) {
                 const t1 = teams.find(t => t.colorName === semifinal2.team1);
                 const t2 = teams.find(t => t.colorName === semifinal2.team2);
-                const winner = semifinal2.score1 > semifinal2.score2 ? semifinal2.team1 : semifinal2.team2;
                 const winnerPlayer = semifinal2.score1 > semifinal2.score2 ? t1?.playerName : t2?.playerName;
-                csv += `Semifinal 2,${semifinal2.team1},${t1?.playerName},${semifinal2.score1},${semifinal2.team2},${t2?.playerName},${semifinal2.score2},${winner},${winnerPlayer}\n`;
+                csv += `Semifinal 2,${t1?.playerName},${semifinal2.team1},${semifinal2.score1},${t2?.playerName},${semifinal2.team2},${semifinal2.score2},${winnerPlayer}\n`;
             }
             
             // Third Place
             if (thirdPlaceMatch) {
                 const t1 = teams.find(t => t.colorName === thirdPlaceMatch.team1);
                 const t2 = teams.find(t => t.colorName === thirdPlaceMatch.team2);
-                const winner = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
                 const winnerPlayer = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? t1?.playerName : t2?.playerName;
-                csv += `Third Place,${thirdPlaceMatch.team1},${t1?.playerName},${thirdPlaceMatch.score1},${thirdPlaceMatch.team2},${t2?.playerName},${thirdPlaceMatch.score2},${winner},${winnerPlayer}\n`;
+                csv += `Third Place,${t1?.playerName},${thirdPlaceMatch.team1},${thirdPlaceMatch.score1},${t2?.playerName},${thirdPlaceMatch.team2},${thirdPlaceMatch.score2},${winnerPlayer}\n`;
             }
             
             // Final
             if (finalMatch) {
                 const t1 = teams.find(t => t.colorName === finalMatch.team1);
                 const t2 = teams.find(t => t.colorName === finalMatch.team2);
-                const winner = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
                 const winnerPlayer = finalMatch.score1 > finalMatch.score2 ? t1?.playerName : t2?.playerName;
-                csv += `Final,${finalMatch.team1},${t1?.playerName},${finalMatch.score1},${finalMatch.team2},${t2?.playerName},${finalMatch.score2},${winner},${winnerPlayer}\n`;
+                csv += `Final,${t1?.playerName},${finalMatch.team1},${finalMatch.score1},${t2?.playerName},${finalMatch.team2},${finalMatch.score2},${winnerPlayer}\n`;
             }
             
             csv += '\n';
-            
-            // Statistics
-            const totalMatches = matches.length + 3;
-            const totalPoints = matches.reduce((sum, m) => sum + m.score1 + m.score2, 0) +
-                               (semifinal1 ? semifinal1.score1 + semifinal1.score2 : 0) +
-                               (semifinal2 ? semifinal2.score1 + semifinal2.score2 : 0) +
-                               finalMatch.score1 + finalMatch.score2 +
-                               thirdPlaceMatch.score1 + thirdPlaceMatch.score2;
-            const totalGames = totalMatches * 2;
-            const avgPointsPerGame = (totalPoints / totalGames).toFixed(1);
-            const mostWins = leaderboard.reduce((max, team) => team.wins > max.wins ? team : max, leaderboard[0]);
-            const mostPoints = leaderboard.reduce((max, team) => team.pointsFor > max.pointsFor ? team : max, leaderboard[0]);
-            
-            csv += 'TOURNAMENT STATISTICS\n';
-            csv += 'Metric,Value\n';
-            csv += `Total Matches Played,${totalMatches}\n`;
-            csv += `Total Points Scored,${totalPoints}\n`;
-            csv += `Average Points per Game,${avgPointsPerGame}\n`;
-            csv += `Most League Wins,${mostWins.colorName} (${mostWins.playerName}) - ${mostWins.wins} wins\n`;
-            csv += `Most League Points,${mostPoints.colorName} (${mostPoints.playerName}) - ${mostPoints.pointsFor} points\n`;
-            csv += `Teams Participated,${teams.length}\n`;
             
             // Download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
