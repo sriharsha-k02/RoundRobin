@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏸 ShuttleSquad Tournament Tracker</title>
+    <title>🏸 ShuttleSquad Doubles Tracker</title>
     <style>
         * {
             margin: 0;
@@ -133,10 +134,21 @@
             margin-bottom: 20px;
         }
         
-        .team-input {
+        /* DOUBLES INPUT STYLING */
+        .team-input-group {
+            background: #F9FAFB;
+            padding: 12px;
+            border-radius: 8px;
             margin-bottom: 16px;
+            border-left: 5px solid #ccc; /* Will be colored via JS */
         }
-        
+
+        .player-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
         .error {
             margin-top: 16px;
             padding: 12px;
@@ -171,6 +183,7 @@
             border-bottom: 1px solid #E5E7EB;
         }
         
+        /* RESPONSIVE MATCH DISPLAY */
         .match-item {
             display: flex;
             justify-content: space-between;
@@ -182,34 +195,52 @@
             margin-bottom: 10px;
         }
         
-        .remaining-box {
-            margin-top: 16px;
-            padding: 12px;
-            background: #F9FAFB;
-            border-radius: 8px;
-            border: 1px solid #E5E7EB;
-        }
-        
-        .flex-row {
+        .match-vs {
             display: flex;
-            gap: 12px;
-            align-items: flex-end;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 12px 0;
+            font-size: 16px; /* Slightly smaller base font */
+            font-weight: 600;
         }
-        
-        .flex-1 {
+
+        .team-name-box {
             flex: 1;
-        }
-        
-        .text-center {
+            min-width: 0;
             text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.3;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
-        .no-matches {
-            color: #6B7280;
-            text-align: center;
-            padding: 20px;
+        /* Style specifically for the pair of names */
+        .pair-names {
+            font-size: 1em;
+            color: #1F2937;
+        }
+
+        .score-box {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 1.2em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         
+        .vs-text {
+            color: #9CA3AF;
+            font-size: 0.8em;
+            flex-shrink: 0;
+            font-weight: 400;
+        }
+
         .match-result {
             background: #F0FDF4;
             border: 2px solid #10B981;
@@ -236,76 +267,37 @@
             margin-bottom: 16px;
         }
 
-        .playoff-match h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #374151;
-        }
-
-        /* --- UPDATED CSS FOR RESPONSIVE MATCH DISPLAY --- */
-        .match-vs {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin: 12px 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        /* New container for team names to handle wrapping */
-        .team-name-box {
-            flex: 1;
-            min-width: 0; /* Allows text to wrap inside flex item */
-            text-align: center;
-            word-wrap: break-word; /* Forces long names to break */
-            overflow-wrap: break-word;
-            line-height: 1.2;
-            padding: 0 4px;
-        }
-
-        .score-box {
-            background: white;
-            padding: 4px 10px;
-            border-radius: 6px;
-            white-space: nowrap;
-            flex-shrink: 0; /* Prevent score from squishing */
-        }
-        
-        .vs-text {
-            color: #6B7280;
+        .minimize-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
-            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Responsive adjustments for iPhone/Mobile */
+        .minimize-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         @media (max-width: 768px) {
             .grid-2 {
                 grid-template-columns: 1fr;
             }
-            
-            /* Reduce font sizes on mobile to fit names better */
-            .match-vs {
-                font-size: 16px; 
-            }
-            
-            .team-name-box {
-                font-size: 14px;
-            }
-
-            .match-result h3 {
-                font-size: 16px;
-                text-align: center;
+            .player-inputs {
+                grid-template-columns: 1fr; /* Stack inputs on small mobile */
             }
         }
-        /* --- END UPDATES --- */
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏸ShuttleSquad🏸 </h1>
-            <button id="resetBtn" class="btn-gray hidden" onclick="resetTournament()">Reset Tournament</button>
+            <h1>🏸 ShuttleSquad 🏸</h1>
+            <p style="opacity: 0.8; font-size: 14px;">Doubles Tournament Tracker</p>
+            <button id="resetBtn" class="btn-gray hidden" style="margin-top: 10px;" onclick="resetTournament()">Reset Tournament</button>
         </div>
 
         <div class="card">
@@ -353,10 +345,10 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Team</th>
-                                    <th class="text-center">Played</th>
-                                    <th class="text-center">Wins</th>
-                                    <th class="text-center">Losses</th>
+                                    <th>Team Pair</th>
+                                    <th class="text-center">Plyd</th>
+                                    <th class="text-center">W</th>
+                                    <th class="text-center">L</th>
                                     <th class="text-center">+/-</th>
                                 </tr>
                             </thead>
@@ -368,14 +360,14 @@
 
               <div class="card">
                 <h2 style="margin-bottom: 16px;">Check Remaining Matches</h2>
-                <div class="flex-row">
-                    <div class="flex-1">
+                <div class="flex-row" style="display:flex; gap:10px; align-items:flex-end;">
+                    <div class="flex-1" style="flex:1;">
                         <label>Select Team</label>
                         <select id="remainingTeamSelect">
                             <option value="">Choose a team</option>
                         </select>
                     </div>
-                    <button class="btn-purple" onclick="showRemainingMatches()">Show Remaining</button>
+                    <button class="btn-purple" onclick="showRemainingMatches()">Show</button>
                 </div>
                 <div id="remainingMatchesBox" class="hidden"></div>
             </div>
@@ -397,23 +389,18 @@
             </div>
 
             <div class="card" id="tournamentSummaryCard" class="hidden">
-                <h2 style="margin-bottom: 16px;">🏆 Tournament Results & Statistics</h2>
+                <h2 style="margin-bottom: 16px;">🏆 Tournament Results</h2>
                 <div id="tournamentSummaryContent"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // UPDATED: Added more colors to support 12 teams
+        // Colors are kept ONLY for visual styling (borders), not for ID logic
         const TEAM_COLORS = [
             '#EF4444', '#3B82F6', '#10B981', '#F59E0B', 
             '#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
             '#06b6d4', '#6366f1', '#65a30d', '#78350f'
-        ];
-        const COLOR_NAMES = [
-            'Red', 'Blue', 'Green', 'Orange', 
-            'Purple', 'Pink', 'Teal', 'Coral',
-            'Cyan', 'Indigo', 'Lime', 'Brown'
         ];
         
         let teams = [];
@@ -427,7 +414,6 @@
         let playoffMinimized = false;
         let completedMatchesMinimized = false;
 
-        // Load data on page load
         window.onload = function() {
             const savedTeams = JSON.parse(localStorage.getItem('teams') || '[]');
             const savedMatches = JSON.parse(localStorage.getItem('matches') || '[]');
@@ -451,31 +437,32 @@
 
         function createTeamInputs() {
             const num = parseInt(document.getElementById('numTeams').value);
-            // UPDATED: Validation allows up to 12 teams
             if (num < 2 || num > 12) {
                 showError('setupError', 'Please enter between 2 and 12 teams');
                 return;
             }
 
             teams = Array.from({ length: num }, (_, i) => ({
-                id: i,
+                id: i, // Numeric ID 0, 1, 2...
                 color: TEAM_COLORS[i],
-                colorName: COLOR_NAMES[i],
-                playerName: ''
+                p1: '',
+                p2: '',
+                displayName: ''
             }));
 
             document.getElementById('numTeamsSection').classList.add('hidden');
             const section = document.getElementById('teamInputsSection');
             section.classList.remove('hidden');
             
-            let html = '<h3 style="font-size: 16px; margin-bottom: 16px; color: #374151;">Enter Player Names</h3>';
-            teams.forEach(team => {
+            let html = '<h3 style="font-size: 16px; margin-bottom: 16px; color: #374151;">Enter Team Players (Doubles)</h3>';
+            teams.forEach((team, idx) => {
                 html += `
-                    <div class="team-input">
-                        <label style="color: ${team.color};">Team ${team.colorName}</label>
-                        <input type="text" maxlength="20" id="player_${team.id}" 
-                               placeholder="Enter player name" 
-                               style="border-color: ${team.color};">
+                    <div class="team-input-group" style="border-left-color: ${team.color}">
+                        <label style="color: ${team.color}; margin-bottom: 8px;">Team ${idx + 1}</label>
+                        <div class="player-inputs">
+                            <input type="text" id="p1_${team.id}" placeholder="Player 1 Name" maxlength="12" style="margin-bottom:0">
+                            <input type="text" id="p2_${team.id}" placeholder="Player 2 Name" maxlength="12" style="margin-bottom:0">
+                        </div>
                     </div>
                 `;
             });
@@ -487,13 +474,20 @@
         function saveTeams() {
             let allFilled = true;
             teams.forEach(team => {
-                const input = document.getElementById(`player_${team.id}`);
-                team.playerName = input.value.trim();
-                if (!team.playerName) allFilled = false;
+                const p1 = document.getElementById(`p1_${team.id}`).value.trim();
+                const p2 = document.getElementById(`p2_${team.id}`).value.trim();
+                
+                if (!p1 || !p2) {
+                    allFilled = false;
+                } else {
+                    team.p1 = p1;
+                    team.p2 = p2;
+                    team.displayName = `${p1} / ${p2}`;
+                }
             });
 
             if (!allFilled) {
-                showError('setupError', 'Please fill in all player names');
+                showError('setupError', 'Please fill in ALL player names.');
                 return;
             }
 
@@ -512,8 +506,6 @@
             document.getElementById('tournamentSection').classList.remove('hidden');
             document.getElementById('resetBtn').classList.remove('hidden');
             
-            // Setup header click handler
-            document.getElementById('setupHeader').style.cursor = 'pointer';
             document.getElementById('setupHeader').onclick = toggleSetup;
             
             populateDropdowns();
@@ -543,24 +535,24 @@
             selects.forEach(selectId => {
                 const select = document.getElementById(selectId);
                 const options = teams.map(t => 
-                    `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`
+                    `<option value="${t.id}">${t.displayName}</option>`
                 ).join('');
                 select.innerHTML = `<option value="">${selectId === 'remainingTeamSelect' ? 'Choose a team' : 'Select team'}</option>${options}`;
             });
         }
 
         function addMatch() {
-            const team1 = document.getElementById('team1Select').value;
-            const team2 = document.getElementById('team2Select').value;
+            const team1Id = document.getElementById('team1Select').value;
+            const team2Id = document.getElementById('team2Select').value;
             const score1 = parseInt(document.getElementById('score1').value);
             const score2 = parseInt(document.getElementById('score2').value);
 
-            if (!team1 || !team2) {
+            if (!team1Id || !team2Id) {
                 showError('matchError', 'Please select both teams');
                 return;
             }
 
-            if (team1 === team2) {
+            if (team1Id === team2Id) {
                 showError('matchError', 'Teams must be different');
                 return;
             }
@@ -569,15 +561,19 @@
                 showError('matchError', 'Please enter valid scores');
                 return;
             }
-			
-			if (score1 === score2) {
-                showError('matchError', 'Ties are not allowed. Please play until there is a winner.');
+
+            if (score1 === score2) {
+                showError('matchError', 'Ties are not allowed. Please play until a winner is decided.');
                 return;
             }
 
+            // Convert string IDs from select to numbers
+            const t1 = parseInt(team1Id);
+            const t2 = parseInt(team2Id);
+
             const matchExists = matches.some(m => 
-                (m.team1 === team1 && m.team2 === team2) ||
-                (m.team1 === team2 && m.team2 === team1)
+                (m.team1Id === t1 && m.team2Id === t2) ||
+                (m.team1Id === t2 && m.team2Id === t1)
             );
 
             if (matchExists) {
@@ -587,14 +583,15 @@
 
             matches.push({
                 id: Date.now(),
-                team1,
-                team2,
+                team1Id: t1,
+                team2Id: t2,
                 score1,
                 score2
             });
 
             localStorage.setItem('matches', JSON.stringify(matches));
             
+            // Clear inputs
             document.getElementById('team1Select').value = '';
             document.getElementById('team2Select').value = '';
             document.getElementById('score1').value = '';
@@ -614,521 +611,6 @@
             updateMatchesList();
         }
 
-        function updateLeaderboard() {
-            const stats = teams.map(team => ({
-                ...team,
-                played: 0,
-                wins: 0,
-                losses: 0,
-                pointsFor: 0,
-                pointsAgainst: 0
-            }));
-
-            matches.forEach(match => {
-                const team1Stats = stats.find(s => s.colorName === match.team1);
-                const team2Stats = stats.find(s => s.colorName === match.team2);
-
-                if (team1Stats && team2Stats) {
-                    team1Stats.played++;
-                    team2Stats.played++;
-                    team1Stats.pointsFor += match.score1;
-                    team1Stats.pointsAgainst += match.score2;
-                    team2Stats.pointsFor += match.score2;
-                    team2Stats.pointsAgainst += match.score1;
-
-                    if (match.score1 > match.score2) {
-                        team1Stats.wins++;
-                        team2Stats.losses++;
-                    } else {
-                        team2Stats.wins++;
-                        team1Stats.losses++;
-                    }
-                }
-            });
-
-            const leaderboard = stats
-                .map(s => ({
-                    ...s,
-                    pointDiff: s.pointsFor - s.pointsAgainst
-                }))
-                .sort((a, b) => {
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return b.pointDiff - a.pointDiff;
-                });
-
-            const tbody = document.getElementById('leaderboardBody');
-            tbody.innerHTML = leaderboard.map(team => `
-                <tr>
-                    <td>
-                        <span style="color: ${team.color}; font-weight: 600;">${team.colorName}</span>
-                        <span style="color: #6B7280; font-size: 12px; margin-left: 4px;">(${team.playerName})</span>
-                    </td>
-                    <td class="text-center">${team.played}</td>
-                    <td class="text-center" style="font-weight: 600; color: #10B981;">${team.wins}</td>
-                    <td class="text-center" style="font-weight: 600; color: #EF4444;">${team.losses}</td>
-                    <td class="text-center" style="font-weight: 600; color: ${team.pointDiff >= 0 ? '#10B981' : '#EF4444'};">
-                        ${team.pointDiff >= 0 ? '+' : ''}${team.pointDiff}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateMatchesList() {
-            document.getElementById('matchCount').textContent = matches.length;
-            const list = document.getElementById('matchesList');
-            
-            if (matches.length === 0) {
-                list.innerHTML = '<div class="no-matches">No matches recorded yet</div>';
-                return;
-            }
-
-            list.innerHTML = matches.map(match => {
-                const t1 = teams.find(t => t.colorName === match.team1);
-                const t2 = teams.find(t => t.colorName === match.team2);
-                return `
-                    <div class="match-item">
-                        <div style="font-size: 14px;">
-                            <span style="color: ${t1?.color}; font-weight: 600;">${match.team1}</span>
-                            <span style="margin: 0 8px; font-weight: 600;">(${match.score1})</span>
-                            <span style="color: #6B7280;">vs</span>
-                            <span style="margin: 0 8px; font-weight: 600;">(${match.score2})</span>
-                            <span style="color: ${t2?.color}; font-weight: 600;">${match.team2}</span>
-                        </div>
-                        <button class="btn-danger" onclick="cancelMatch(${match.id})" title="Cancel match">✕</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function showRemainingMatches() {
-            const selectedTeam = document.getElementById('remainingTeamSelect').value;
-            if (!selectedTeam) {
-                alert('Please select a team');
-                return;
-            }
-
-            const playedAgainst = matches
-                .filter(m => m.team1 === selectedTeam || m.team2 === selectedTeam)
-                .map(m => m.team1 === selectedTeam ? m.team2 : m.team1);
-
-            const remaining = teams
-                .filter(t => t.colorName !== selectedTeam && !playedAgainst.includes(t.colorName));
-
-            const box = document.getElementById('remainingMatchesBox');
-            box.classList.remove('hidden');
-
-            if (remaining.length === 0) {
-                box.innerHTML = `
-                    <div class="remaining-box">
-                        <h3 style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">
-                            ${selectedTeam} needs to play against:
-                        </h3>
-                        <p style="color: #10B981; font-weight: 600; font-size: 14px;">✓ All matches completed!</p>
-                    </div>
-                `;
-            } else {
-                const list = remaining.map(team => 
-                    `<li style="color: ${team.color}; font-weight: 600; font-size: 14px; margin-bottom: 4px;">
-                        ${team.colorName} (${team.playerName})
-                    </li>`
-                ).join('');
-                
-                box.innerHTML = `
-                    <div class="remaining-box">
-                        <h3 style="font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 8px;">
-                            ${selectedTeam} needs to play against:
-                        </h3>
-                        <ul style="margin: 0; padding-left: 20px;">${list}</ul>
-                    </div>
-                `;
-            }
-        }
-
-        function resetTournament() {
-            if (confirm('Are you sure you want to reset and start over?')) {
-                localStorage.removeItem('teams');
-                localStorage.removeItem('matches');
-                localStorage.removeItem('semifinal1');
-                localStorage.removeItem('semifinal2');
-                localStorage.removeItem('finalMatch');
-                localStorage.removeItem('thirdPlaceMatch');
-                location.reload();
-            }
-        }
-
-        function updatePlayoffSection() {
-            const content = document.getElementById('semifinalContent');
-            
-            if (teams.length < 4) {
-                content.innerHTML = '<p class="no-matches">Need at least 4 teams for playoffs</p>';
-                return;
-            }
-
-            const leaderboard = getLeaderboardData();
-            const top4 = leaderboard.slice(0, 4);
-            
-            const hasClearTop4 = leaderboard.length === 4 || 
-                (leaderboard.length > 4 && 
-                 (top4[3].wins !== leaderboard[4].wins || 
-                  (top4[3].wins === leaderboard[4].wins && top4[3].pointDiff !== leaderboard[4].pointDiff)));
-
-            let html = '';
-
-            // Show Final Match if exists
-            if (finalMatch) {
-                html += renderMatchResult(finalMatch, 'final', '🏆 Final Match', 'final');
-            }
-
-            // Show Third Place Match if exists
-            if (thirdPlaceMatch) {
-                html += renderMatchResult(thirdPlaceMatch, 'third-place', '🥉 Third Place Match', 'thirdPlace');
-            }
-
-            // Semifinal 1
-            if (semifinal1) {
-                html += renderMatchResult(semifinal1, '', '⚔️ Semifinal Match 1', 'semifinal1');
-            } else if (hasClearTop4) {
-                html += renderSemifinalInput('semifinal1', 'Semifinal Match 1', top4[0], top4[3]);
-            } else {
-                html += renderSemifinalInputManual('semifinal1', 'Semifinal Match 1');
-            }
-
-            // Semifinal 2
-            if (semifinal2) {
-                html += renderMatchResult(semifinal2, '', '⚔️ Semifinal Match 2', 'semifinal2');
-            } else if (hasClearTop4) {
-                html += renderSemifinalInput('semifinal2', 'Semifinal Match 2', top4[1], top4[2]);
-            } else {
-                html += renderSemifinalInputManual('semifinal2', 'Semifinal Match 2');
-            }
-
-            // Show final input if both semifinals are complete
-            if (semifinal1 && semifinal2 && !finalMatch && !thirdPlaceMatch) {
-                const sf1Winner = semifinal1.score1 > semifinal1.score2 ? semifinal1.team1 : semifinal1.team2;
-                const sf2Winner = semifinal2.score1 > semifinal2.score2 ? semifinal2.team1 : semifinal2.team2;
-                const sf1Loser = semifinal1.score1 > semifinal1.score2 ? semifinal1.team2 : semifinal1.team1;
-                const sf2Loser = semifinal2.score1 > semifinal2.score2 ? semifinal2.team2 : semifinal2.team1;
-                
-                html += renderFinalInput(sf1Winner, sf2Winner, sf1Loser, sf2Loser);
-            }
-
-            content.innerHTML = html || '<p class="no-matches">Complete round robin matches to start playoffs</p>';
-        }
-
-        function editMatch(matchType) {
-            if (matchType === 'semifinal1') {
-                semifinal1 = null;
-                localStorage.removeItem('semifinal1');
-            } else if (matchType === 'semifinal2') {
-                semifinal2 = null;
-                localStorage.removeItem('semifinal2');
-            } else if (matchType === 'final') {
-                finalMatch = null;
-                localStorage.removeItem('finalMatch');
-            } else if (matchType === 'thirdPlace') {
-                thirdPlaceMatch = null;
-                localStorage.removeItem('thirdPlaceMatch');
-            }
-            
-            updatePlayoffSection();
-            updateTournamentSummary();
-        }
-
-        // UPDATED: Completely rewritten to use the new flexbox classes for proper wrapping
-        function renderMatchResult(match, extraClass, title) {
-            const t1 = teams.find(t => t.colorName === match.team1);
-            const t2 = teams.find(t => t.colorName === match.team2);
-            const winner = match.score1 > match.score2 ? match.team1 : match.team2;
-            const winnerColor = match.score1 > match.score2 ? t1?.color : t2?.color;
-            const isWinner1 = match.score1 > match.score2;
-            
-            // Note: used style attributes for simplicity, but using classes from header style is key
-            return `
-                <div class="match-result ${extraClass}">
-                    <h3 style="margin-bottom: 12px;">${title}</h3>
-                    <div class="match-vs">
-                        <div class="team-name-box">
-                            <div style="color: ${t1?.color}; font-weight: bold; ${isWinner1 ? 'font-size: 1.1em;' : ''}">${match.team1}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${t1?.playerName || ''}</div>
-                        </div>
-                        
-                        <div class="score-box">${match.score1}</div>
-                        <div class="vs-text">vs</div>
-                        <div class="score-box">${match.score2}</div>
-                        
-                        <div class="team-name-box">
-                            <div style="color: ${t2?.color}; font-weight: bold; ${!isWinner1 ? 'font-size: 1.1em;' : ''}">${match.team2}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${t2?.playerName || ''}</div>
-                        </div>
-                    </div>
-                    <p style="text-align: center; margin-top: 8px; color: ${winnerColor}; font-weight: 600; font-size: 0.9em;">
-                        🏆 Winner: ${winner}
-                    </p>
-                </div>
-            `;
-        }
-
-        function renderSemifinalInput(matchId, title, team1, team2) {
-            return `
-                <div class="playoff-match">
-                    <h3>⚔️ ${title}</h3>
-                    <div class="match-vs">
-                        <div class="team-name-box">
-                            <div style="color: ${team1.color}; font-weight: bold;">${team1.colorName}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${team1.playerName}</div>
-                        </div>
-                        <span class="vs-text">vs</span>
-                        <div class="team-name-box">
-                            <div style="color: ${team2.color}; font-weight: bold;">${team2.colorName}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${team2.playerName}</div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-                        <div>
-                            <label>Score ${team1.colorName}</label>
-                            <input type="number" id="${matchId}_score1" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                        <div>
-                            <label>Score ${team2.colorName}</label>
-                            <input type="number" id="${matchId}_score2" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                    </div>
-                    <button class="btn-success" style="margin-top: 12px;" onclick="saveSemifinal('${matchId}', '${team1.colorName}', '${team2.colorName}')">
-                        Save Result
-                    </button>
-                </div>
-            `;
-        }
-
-        function renderSemifinalInputManual(matchId, title) {
-            return `
-                <div class="playoff-match">
-                    <h3>⚔️ ${title}</h3>
-                    <p style="color: #6B7280; font-size: 14px; margin-bottom: 12px;">
-                        Tied positions detected. Please select teams manually.
-                    </p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div>
-                            <label>Team 1</label>
-                            <select id="${matchId}_team1" style="margin-bottom: 0;">
-                                <option value="">Select team</option>
-                                ${teams.map(t => `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div>
-                            <label>Team 2</label>
-                            <select id="${matchId}_team2" style="margin-bottom: 0;">
-                                <option value="">Select team</option>
-                                ${teams.map(t => `<option value="${t.colorName}">${t.colorName} - ${t.playerName}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-                        <div>
-                            <label>Score 1</label>
-                            <input type="number" id="${matchId}_score1" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                        <div>
-                            <label>Score 2</label>
-                            <input type="number" id="${matchId}_score2" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                    </div>
-                    <button class="btn-success" style="margin-top: 12px;" onclick="saveSemifinalManual('${matchId}')">
-                        Save Result
-                    </button>
-                </div>
-            `;
-        }
-
-        // UPDATED: Rewritten to use flexbox classes for proper wrapping
-        function renderFinalInput(winner1, winner2, loser1, loser2) {
-            const w1Team = teams.find(t => t.colorName === winner1);
-            const w2Team = teams.find(t => t.colorName === winner2);
-            const l1Team = teams.find(t => t.colorName === loser1);
-            const l2Team = teams.find(t => t.colorName === loser2);
-            
-            return `
-                <div class="playoff-match" style="border-color: #F59E0B; margin-bottom: 16px;">
-                    <h3>🏆 Final Match</h3>
-                    <div class="match-vs">
-                        <div class="team-name-box">
-                            <div style="color: ${w1Team?.color}; font-weight: bold;">${winner1}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${w1Team?.playerName}</div>
-                        </div>
-                        <span class="vs-text">vs</span>
-                        <div class="team-name-box">
-                            <div style="color: ${w2Team?.color}; font-weight: bold;">${winner2}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${w2Team?.playerName}</div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-                        <div>
-                            <label>Score ${winner1}</label>
-                            <input type="number" id="final_score1" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                        <div>
-                            <label>Score ${winner2}</label>
-                            <input type="number" id="final_score2" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                    </div>
-                </div>
-                <div class="playoff-match" style="border-color: #EC4899;">
-                    <h3>🥉 Third Place Match</h3>
-                    <div class="match-vs">
-                        <div class="team-name-box">
-                            <div style="color: ${l1Team?.color}; font-weight: bold;">${loser1}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${l1Team?.playerName}</div>
-                        </div>
-                        <span class="vs-text">vs</span>
-                        <div class="team-name-box">
-                            <div style="color: ${l2Team?.color}; font-weight: bold;">${loser2}</div>
-                            <div style="font-size: 0.8em; color: #6B7280;">${l2Team?.playerName}</div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-                        <div>
-                            <label>Score ${loser1}</label>
-                            <input type="number" id="third_score1" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                        <div>
-                            <label>Score ${loser2}</label>
-                            <input type="number" id="third_score2" min="0" placeholder="0" style="margin-bottom: 0;">
-                        </div>
-                    </div>
-                </div>
-                <button class="btn-success" style="margin-top: 12px; background: #10B981; width: 100%;" onclick="saveBothFinalMatches('${winner1}', '${winner2}', '${loser1}', '${loser2}')">
-                    💾 Save Both Final & Third Place Results
-                </button>
-            `;
-        }
-
-        function saveSemifinal(matchId, team1, team2) {
-            const score1 = parseInt(document.getElementById(`${matchId}_score1`).value);
-            const score2 = parseInt(document.getElementById(`${matchId}_score2`).value);
-
-            if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
-                alert('Please enter valid scores');
-                return;
-            }
-
-            if (score1 === score2) {
-                alert('Scores cannot be tied in playoff matches');
-                return;
-            }
-
-            const match = {
-                team1,
-                team2,
-                score1,
-                score2
-            };
-
-            if (matchId === 'semifinal1') {
-                semifinal1 = match;
-                localStorage.setItem('semifinal1', JSON.stringify(match));
-            } else {
-                semifinal2 = match;
-                localStorage.setItem('semifinal2', JSON.stringify(match));
-            }
-
-            updatePlayoffSection();
-        }
-
-        function saveSemifinalManual(matchId) {
-            const team1 = document.getElementById(`${matchId}_team1`).value;
-            const team2 = document.getElementById(`${matchId}_team2`).value;
-            const score1 = parseInt(document.getElementById(`${matchId}_score1`).value);
-            const score2 = parseInt(document.getElementById(`${matchId}_score2`).value);
-
-            if (!team1 || !team2) {
-                alert('Please select both teams');
-                return;
-            }
-
-            if (team1 === team2) {
-                alert('Teams must be different');
-                return;
-            }
-
-            if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
-                alert('Please enter valid scores');
-                return;
-            }
-
-            if (score1 === score2) {
-                alert('Scores cannot be tied in playoff matches');
-                return;
-            }
-
-            const match = {
-                team1,
-                team2,
-                score1,
-                score2
-            };
-
-            if (matchId === 'semifinal1') {
-                semifinal1 = match;
-                localStorage.setItem('semifinal1', JSON.stringify(match));
-            } else {
-                semifinal2 = match;
-                localStorage.setItem('semifinal2', JSON.stringify(match));
-            }
-
-            updatePlayoffSection();
-        }
-
-        function saveBothFinalMatches(winner1, winner2, loser1, loser2) {
-            const finalScore1 = parseInt(document.getElementById('final_score1').value);
-            const finalScore2 = parseInt(document.getElementById('final_score2').value);
-            const thirdScore1 = parseInt(document.getElementById('third_score1').value);
-            const thirdScore2 = parseInt(document.getElementById('third_score2').value);
-
-            // Validate Final match scores
-            if (isNaN(finalScore1) || isNaN(finalScore2) || finalScore1 < 0 || finalScore2 < 0) {
-                alert('Please enter valid scores for the Final match');
-                return;
-            }
-
-            if (finalScore1 === finalScore2) {
-                alert('Final match scores cannot be tied');
-                return;
-            }
-
-            // Validate Third Place match scores
-            if (isNaN(thirdScore1) || isNaN(thirdScore2) || thirdScore1 < 0 || thirdScore2 < 0) {
-                alert('Please enter valid scores for the Third Place match');
-                return;
-            }
-
-            if (thirdScore1 === thirdScore2) {
-                alert('Third Place match scores cannot be tied');
-                return;
-            }
-
-            // Save both matches
-            finalMatch = {
-                team1: winner1,
-                team2: winner2,
-                score1: finalScore1,
-                score2: finalScore2
-            };
-
-            thirdPlaceMatch = {
-                team1: loser1,
-                team2: loser2,
-                score1: thirdScore1,
-                score2: thirdScore2
-            };
-
-            localStorage.setItem('finalMatch', JSON.stringify(finalMatch));
-            localStorage.setItem('thirdPlaceMatch', JSON.stringify(thirdPlaceMatch));
-
-            // Update everything
-            updatePlayoffSection();
-            updateTournamentSummary();
-        }
-
         function getLeaderboardData() {
             const stats = teams.map(team => ({
                 ...team,
@@ -1140,8 +622,8 @@
             }));
 
             matches.forEach(match => {
-                const team1Stats = stats.find(s => s.colorName === match.team1);
-                const team2Stats = stats.find(s => s.colorName === match.team2);
+                const team1Stats = stats.find(s => s.id === match.team1Id);
+                const team2Stats = stats.find(s => s.id === match.team2Id);
 
                 if (team1Stats && team2Stats) {
                     team1Stats.played++;
@@ -1172,39 +654,415 @@
                 });
         }
 
-        function togglePlayoff() {
-            playoffMinimized = !playoffMinimized;
-            const content = document.getElementById('semifinalContent');
-            const chevron = document.getElementById('playoffChevron');
+        function updateLeaderboard() {
+            const leaderboard = getLeaderboardData();
+            const tbody = document.getElementById('leaderboardBody');
             
-            if (playoffMinimized) {
-                content.classList.add('hidden');
-                chevron.textContent = '▶';
+            tbody.innerHTML = leaderboard.map(team => `
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; font-size: 14px; border-left: 3px solid ${team.color}; padding-left: 8px;">
+                            ${team.p1} / ${team.p2}
+                        </div>
+                    </td>
+                    <td class="text-center">${team.played}</td>
+                    <td class="text-center" style="font-weight: 600; color: #10B981;">${team.wins}</td>
+                    <td class="text-center" style="font-weight: 600; color: #EF4444;">${team.losses}</td>
+                    <td class="text-center" style="font-weight: 600; color: ${team.pointDiff >= 0 ? '#10B981' : '#EF4444'};">
+                        ${team.pointDiff >= 0 ? '+' : ''}${team.pointDiff}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateMatchesList() {
+            document.getElementById('matchCount').textContent = matches.length;
+            const list = document.getElementById('matchesList');
+            
+            if (matches.length === 0) {
+                list.innerHTML = '<div class="no-matches">No matches recorded yet</div>';
+                return;
+            }
+
+            list.innerHTML = matches.map(match => {
+                const t1 = teams.find(t => t.id === match.team1Id);
+                const t2 = teams.find(t => t.id === match.team2Id);
+                
+                // Safety check
+                if (!t1 || !t2) return '';
+
+                const isWinner1 = match.score1 > match.score2;
+                
+                return `
+                    <div class="match-item">
+                        <div class="match-vs" style="width: 100%; margin: 0;">
+                            <div class="team-name-box" style="text-align: right;">
+                                <div style="color: ${isWinner1 ? t1.color : '#6B7280'}; font-weight: ${isWinner1 ? 'bold' : 'normal'}">
+                                    ${t1.displayName}
+                                </div>
+                            </div>
+                            <div class="score-box" style="font-size: 14px; padding: 2px 8px;">${match.score1}</div>
+                            <div class="vs-text">-</div>
+                            <div class="score-box" style="font-size: 14px; padding: 2px 8px;">${match.score2}</div>
+                            <div class="team-name-box" style="text-align: left;">
+                                <div style="color: ${!isWinner1 ? t2.color : '#6B7280'}; font-weight: ${!isWinner1 ? 'bold' : 'normal'}">
+                                    ${t2.displayName}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-danger" style="margin-left: 10px;" onclick="cancelMatch(${match.id})" title="Cancel match">✕</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showRemainingMatches() {
+            const selectedTeamId = parseInt(document.getElementById('remainingTeamSelect').value);
+            if (isNaN(selectedTeamId)) {
+                alert('Please select a team');
+                return;
+            }
+
+            const playedAgainstIds = matches
+                .filter(m => m.team1Id === selectedTeamId || m.team2Id === selectedTeamId)
+                .map(m => m.team1Id === selectedTeamId ? m.team2Id : m.team1Id);
+
+            const remaining = teams
+                .filter(t => t.id !== selectedTeamId && !playedAgainstIds.includes(t.id));
+
+            const box = document.getElementById('remainingMatchesBox');
+            box.classList.remove('hidden');
+
+            const selectedTeamName = teams.find(t => t.id === selectedTeamId)?.displayName;
+
+            if (remaining.length === 0) {
+                box.innerHTML = `
+                    <div class="remaining-box">
+                        <h3 style="font-size: 14px; margin-bottom: 8px;">
+                            ${selectedTeamName} needs to play against:
+                        </h3>
+                        <p style="color: #10B981; font-weight: 600;">✓ All matches completed!</p>
+                    </div>
+                `;
             } else {
-                content.classList.remove('hidden');
-                chevron.textContent = '▼';
+                const list = remaining.map(team => 
+                    `<li style="margin-bottom: 4px; border-left: 3px solid ${team.color}; padding-left: 8px;">
+                        ${team.displayName}
+                    </li>`
+                ).join('');
+                
+                box.innerHTML = `
+                    <div class="remaining-box">
+                        <h3 style="font-size: 14px; margin-bottom: 8px;">
+                            ${selectedTeamName} needs to play against:
+                        </h3>
+                        <ul style="margin: 0; padding-left: 20px;">${list}</ul>
+                    </div>
+                `;
             }
         }
 
-        function toggleCompletedMatches() {
-            completedMatchesMinimized = !completedMatchesMinimized;
-            const content = document.getElementById('matchesList');
-            const chevron = document.getElementById('completedChevron');
+        function renderMatchResult(match, extraClass, title) {
+            const t1 = teams.find(t => t.id === match.team1Id);
+            const t2 = teams.find(t => t.id === match.team2Id);
+            // Handling manual entry or object storage
+            const t1Name = t1 ? t1.displayName : "Team 1";
+            const t2Name = t2 ? t2.displayName : "Team 2";
+            const t1Color = t1 ? t1.color : '#333';
+            const t2Color = t2 ? t2.color : '#333';
+
+            const winnerName = match.score1 > match.score2 ? t1Name : t2Name;
+            const winnerColor = match.score1 > match.score2 ? t1Color : t2Color;
+            const isWinner1 = match.score1 > match.score2;
             
-            if (completedMatchesMinimized) {
-                content.classList.add('hidden');
-                chevron.textContent = '▶';
-            } else {
-                content.classList.remove('hidden');
-                chevron.textContent = '▼';
+            return `
+                <div class="match-result ${extraClass}">
+                    <h3 style="margin-bottom: 12px; font-size: 16px;">${title}</h3>
+                    <div class="match-vs">
+                        <div class="team-name-box">
+                            <div class="pair-names" style="color: ${t1Color}; font-weight: bold; ${isWinner1 ? 'font-size: 1.1em;' : ''}">
+                                ${t1Name}
+                            </div>
+                        </div>
+                        
+                        <div class="score-box">${match.score1}</div>
+                        <div class="vs-text">vs</div>
+                        <div class="score-box">${match.score2}</div>
+                        
+                        <div class="team-name-box">
+                            <div class="pair-names" style="color: ${t2Color}; font-weight: bold; ${!isWinner1 ? 'font-size: 1.1em;' : ''}">
+                                ${t2Name}
+                            </div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 8px; color: ${winnerColor}; font-weight: 600; font-size: 0.9em;">
+                        🏆 Winner: ${winnerName}
+                    </p>
+                </div>
+            `;
+        }
+
+        function renderSemifinalInput(matchId, title, team1, team2) {
+            return `
+                <div class="playoff-match">
+                    <h3>⚔️ ${title}</h3>
+                    <div class="match-vs">
+                        <div class="team-name-box">
+                            <div style="color: ${team1.color}; font-weight: bold;">${team1.displayName}</div>
+                        </div>
+                        <span class="vs-text">vs</span>
+                        <div class="team-name-box">
+                            <div style="color: ${team2.color}; font-weight: bold;">${team2.displayName}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label>Score Top Seed</label>
+                            <input type="number" id="${matchId}_score1" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                        <div>
+                            <label>Score Low Seed</label>
+                            <input type="number" id="${matchId}_score2" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+                    <button class="btn-success" style="margin-top: 12px;" onclick="saveSemifinal('${matchId}', ${team1.id}, ${team2.id})">
+                        Save Result
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderSemifinalInputManual(matchId, title) {
+            return `
+                <div class="playoff-match">
+                    <h3>⚔️ ${title}</h3>
+                    <p style="color: #6B7280; font-size: 14px; margin-bottom: 12px;">
+                        Tied positions detected. Please select teams manually.
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label>Team 1</label>
+                            <select id="${matchId}_team1" style="margin-bottom: 0;">
+                                <option value="">Select team</option>
+                                ${teams.map(t => `<option value="${t.id}">${t.displayName}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label>Team 2</label>
+                            <select id="${matchId}_team2" style="margin-bottom: 0;">
+                                <option value="">Select team</option>
+                                ${teams.map(t => `<option value="${t.id}">${t.displayName}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label>Score 1</label>
+                            <input type="number" id="${matchId}_score1" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                        <div>
+                            <label>Score 2</label>
+                            <input type="number" id="${matchId}_score2" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+                    <button class="btn-success" style="margin-top: 12px;" onclick="saveSemifinalManual('${matchId}')">
+                        Save Result
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderFinalInput(winner1Id, winner2Id, loser1Id, loser2Id) {
+            const w1Team = teams.find(t => t.id === winner1Id);
+            const w2Team = teams.find(t => t.id === winner2Id);
+            const l1Team = teams.find(t => t.id === loser1Id);
+            const l2Team = teams.find(t => t.id === loser2Id);
+            
+            return `
+                <div class="playoff-match" style="border-color: #F59E0B; margin-bottom: 16px;">
+                    <h3>🏆 Final Match</h3>
+                    <div class="match-vs">
+                        <div class="team-name-box">
+                            <div style="color: ${w1Team?.color}; font-weight: bold;">${w1Team?.displayName}</div>
+                        </div>
+                        <span class="vs-text">vs</span>
+                        <div class="team-name-box">
+                            <div style="color: ${w2Team?.color}; font-weight: bold;">${w2Team?.displayName}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label>Score ${w1Team?.p1.split(' ')[0]}</label>
+                            <input type="number" id="final_score1" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                        <div>
+                            <label>Score ${w2Team?.p1.split(' ')[0]}</label>
+                            <input type="number" id="final_score2" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+                </div>
+                <div class="playoff-match" style="border-color: #EC4899;">
+                    <h3>🥉 Third Place Match</h3>
+                    <div class="match-vs">
+                        <div class="team-name-box">
+                            <div style="color: ${l1Team?.color}; font-weight: bold;">${l1Team?.displayName}</div>
+                        </div>
+                        <span class="vs-text">vs</span>
+                        <div class="team-name-box">
+                            <div style="color: ${l2Team?.color}; font-weight: bold;">${l2Team?.displayName}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label>Score ${l1Team?.p1.split(' ')[0]}</label>
+                            <input type="number" id="third_score1" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                        <div>
+                            <label>Score ${l2Team?.p1.split(' ')[0]}</label>
+                            <input type="number" id="third_score2" min="0" placeholder="0" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-success" style="margin-top: 12px; background: #10B981; width: 100%;" onclick="saveBothFinalMatches(${winner1Id}, ${winner2Id}, ${loser1Id}, ${loser2Id})">
+                    💾 Save All Final Results
+                </button>
+            `;
+        }
+
+        // Logic Functions for Semifinals/Finals
+        function updatePlayoffSection() {
+            const content = document.getElementById('semifinalContent');
+            
+            if (teams.length < 4) {
+                content.innerHTML = '<p class="no-matches">Need at least 4 teams for playoffs</p>';
+                return;
             }
+
+            const leaderboard = getLeaderboardData();
+            const top4 = leaderboard.slice(0, 4);
+            
+            // Check clear seeding
+            const hasClearTop4 = leaderboard.length === 4 || 
+                (leaderboard.length > 4 && 
+                 (top4[3].wins !== leaderboard[4].wins || 
+                  (top4[3].wins === leaderboard[4].wins && top4[3].pointDiff !== leaderboard[4].pointDiff)));
+
+            let html = '';
+
+            if (finalMatch) {
+                html += renderMatchResult(finalMatch, 'final', '🏆 Final Match');
+            }
+            if (thirdPlaceMatch) {
+                html += renderMatchResult(thirdPlaceMatch, 'third-place', '🥉 Third Place Match');
+            }
+
+            // Semi 1: 1st vs 4th
+            if (semifinal1) {
+                html += renderMatchResult(semifinal1, '', '⚔️ Semifinal Match 1 (1st vs 4th)');
+            } else if (hasClearTop4) {
+                html += renderSemifinalInput('semifinal1', 'Semifinal Match 1 (1st vs 4th)', top4[0], top4[3]);
+            } else {
+                html += renderSemifinalInputManual('semifinal1', 'Semifinal Match 1');
+            }
+
+            // Semi 2: 2nd vs 3rd
+            if (semifinal2) {
+                html += renderMatchResult(semifinal2, '', '⚔️ Semifinal Match 2 (2nd vs 3rd)');
+            } else if (hasClearTop4) {
+                html += renderSemifinalInput('semifinal2', 'Semifinal Match 2 (2nd vs 3rd)', top4[1], top4[2]);
+            } else {
+                html += renderSemifinalInputManual('semifinal2', 'Semifinal Match 2');
+            }
+
+            // Show final input logic
+            if (semifinal1 && semifinal2 && !finalMatch && !thirdPlaceMatch) {
+                const sf1WinnerId = semifinal1.score1 > semifinal1.score2 ? semifinal1.team1Id : semifinal1.team2Id;
+                const sf1LoserId = semifinal1.score1 > semifinal1.score2 ? semifinal1.team2Id : semifinal1.team1Id;
+                
+                const sf2WinnerId = semifinal2.score1 > semifinal2.score2 ? semifinal2.team1Id : semifinal2.team2Id;
+                const sf2LoserId = semifinal2.score1 > semifinal2.score2 ? semifinal2.team2Id : semifinal2.team1Id;
+                
+                html += renderFinalInput(sf1WinnerId, sf2WinnerId, sf1LoserId, sf2LoserId);
+            }
+
+            content.innerHTML = html || '<p class="no-matches">Complete round robin matches to start playoffs</p>';
+        }
+
+        function saveSemifinal(matchId, t1Id, t2Id) {
+            const score1 = parseInt(document.getElementById(`${matchId}_score1`).value);
+            const score2 = parseInt(document.getElementById(`${matchId}_score2`).value);
+
+            if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
+                alert('Please enter valid scores');
+                return;
+            }
+            if (score1 === score2) {
+                alert('Scores cannot be tied in playoffs');
+                return;
+            }
+
+            const match = { team1Id: t1Id, team2Id: t2Id, score1, score2 };
+
+            if (matchId === 'semifinal1') {
+                semifinal1 = match;
+                localStorage.setItem('semifinal1', JSON.stringify(match));
+            } else {
+                semifinal2 = match;
+                localStorage.setItem('semifinal2', JSON.stringify(match));
+            }
+            updatePlayoffSection();
+        }
+
+        function saveSemifinalManual(matchId) {
+            const t1Id = parseInt(document.getElementById(`${matchId}_team1`).value);
+            const t2Id = parseInt(document.getElementById(`${matchId}_team2`).value);
+            const score1 = parseInt(document.getElementById(`${matchId}_score1`).value);
+            const score2 = parseInt(document.getElementById(`${matchId}_score2`).value);
+
+            if (isNaN(t1Id) || isNaN(t2Id)) { alert("Select teams"); return; }
+            if (t1Id === t2Id) { alert("Same team selected"); return; }
+            if (isNaN(score1) || isNaN(score2)) { alert("Invalid score"); return; }
+            if (score1 === score2) { alert("No ties allowed"); return; }
+
+            const match = { team1Id: t1Id, team2Id: t2Id, score1, score2 };
+            
+            if (matchId === 'semifinal1') {
+                semifinal1 = match;
+                localStorage.setItem('semifinal1', JSON.stringify(match));
+            } else {
+                semifinal2 = match;
+                localStorage.setItem('semifinal2', JSON.stringify(match));
+            }
+            updatePlayoffSection();
+        }
+
+        function saveBothFinalMatches(w1Id, w2Id, l1Id, l2Id) {
+            const fs1 = parseInt(document.getElementById('final_score1').value);
+            const fs2 = parseInt(document.getElementById('final_score2').value);
+            const ts1 = parseInt(document.getElementById('third_score1').value);
+            const ts2 = parseInt(document.getElementById('third_score2').value);
+
+            if (isNaN(fs1) || isNaN(fs2) || isNaN(ts1) || isNaN(ts2)) {
+                alert('Please fill all scores'); return;
+            }
+            if (fs1 === fs2 || ts1 === ts2) {
+                alert('No ties allowed in finals'); return;
+            }
+
+            finalMatch = { team1Id: w1Id, team2Id: w2Id, score1: fs1, score2: fs2 };
+            thirdPlaceMatch = { team1Id: l1Id, team2Id: l2Id, score1: ts1, score2: ts2 };
+
+            localStorage.setItem('finalMatch', JSON.stringify(finalMatch));
+            localStorage.setItem('thirdPlaceMatch', JSON.stringify(thirdPlaceMatch));
+
+            updatePlayoffSection();
+            updateTournamentSummary();
         }
 
         function updateTournamentSummary() {
             const summaryCard = document.getElementById('tournamentSummaryCard');
             const summaryContent = document.getElementById('tournamentSummaryContent');
             
-            // Check if tournament is complete (final and third place matches done)
             if (!finalMatch || !thirdPlaceMatch) {
                 summaryCard.classList.add('hidden');
                 return;
@@ -1212,241 +1070,118 @@
 
             summaryCard.classList.remove('hidden');
 
-            // Get winners
-            const champion = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
-            const runnerUp = finalMatch.score1 > finalMatch.score2 ? finalMatch.team2 : finalMatch.team1;
-            const thirdPlace = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
+            const championId = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1Id : finalMatch.team2Id;
+            const runnerUpId = finalMatch.score1 > finalMatch.score2 ? finalMatch.team2Id : finalMatch.team1Id;
+            const thirdPlaceId = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1Id : thirdPlaceMatch.team2Id;
 
-            const championTeam = teams.find(t => t.colorName === champion);
-            const runnerUpTeam = teams.find(t => t.colorName === runnerUp);
-            const thirdPlaceTeam = teams.find(t => t.colorName === thirdPlace);
-
-            // Calculate statistics
-            const leaderboard = getLeaderboardData();
-            
-            // Most wins
-            const mostWins = leaderboard.reduce((max, team) => team.wins > max.wins ? team : max, leaderboard[0]);
-            
-            // Most points scored
-            const mostPoints = leaderboard.reduce((max, team) => team.pointsFor > max.pointsFor ? team : max, leaderboard[0]);
-            
-            // Best point differential
-            const bestDiff = leaderboard.reduce((max, team) => team.pointDiff > max.pointDiff ? team : max, leaderboard[0]);
-            
-            // Total matches
-            const totalMatches = matches.length + 3; // Round robin + 2 semifinals + final + third place
-            
-            // Total points scored
-            const totalPoints = matches.reduce((sum, m) => sum + m.score1 + m.score2, 0) +
-                               (semifinal1 ? semifinal1.score1 + semifinal1.score2 : 0) +
-                               (semifinal2 ? semifinal2.score1 + semifinal2.score2 : 0) +
-                               finalMatch.score1 + finalMatch.score2 +
-                               thirdPlaceMatch.score1 + thirdPlaceMatch.score2;
-            
-            // Average points per game (each match has 2 games/scores, so divide by matches * 2)
-            const totalGames = totalMatches * 2;
-            const avgPointsPerGame = (totalPoints / totalGames).toFixed(1);
-
-            // Find highest scoring match
-            const allMatches = [
-                ...matches,
-                ...(semifinal1 ? [semifinal1] : []),
-                ...(semifinal2 ? [semifinal2] : []),
-                finalMatch,
-                thirdPlaceMatch
-            ];
-            const highestScoringMatch = allMatches.reduce((max, m) => {
-                const total = m.score1 + m.score2;
-                const maxTotal = max.score1 + max.score2;
-                return total > maxTotal ? m : max;
-            }, allMatches[0]);
+            const champ = teams.find(t => t.id === championId);
+            const runner = teams.find(t => t.id === runnerUpId);
+            const third = teams.find(t => t.id === thirdPlaceId);
 
             summaryContent.innerHTML = `
-                <div style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    <h3 style="text-align: center; font-size: 28px; margin-bottom: 10px;">🏆 Tournament Complete! 🏆</h3>
-                    <p style="text-align: center; opacity: 0.9; margin-bottom: 30px;">Congratulations to all participants!</p>
-                    
-                    <div style="text-align: center; margin-bottom: 30px;">
+                <div style="background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                    <div style="margin-bottom: 20px;">
                         <div style="font-size: 40px;">🥇</div>
-                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">${champion}</div>
-                        <div style="opacity: 0.8;">${championTeam?.playerName}</div>
+                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">${champ ? champ.displayName : ''}</div>
+                        <div style="opacity: 0.8; font-size: 14px;">CHAMPIONS</div>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
                         <div>
                             <div style="font-size: 30px;">🥈</div>
-                            <div style="font-size: 18px; font-weight: bold;">${runnerUp}</div>
-                            <div style="font-size: 14px; opacity: 0.8;">${runnerUpTeam?.playerName}</div>
+                            <div style="font-size: 16px; font-weight: bold;">${runner ? runner.displayName : ''}</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Runner Up</div>
                         </div>
                         <div>
                             <div style="font-size: 30px;">🥉</div>
-                            <div style="font-size: 18px; font-weight: bold;">${thirdPlace}</div>
-                            <div style="font-size: 14px; opacity: 0.8;">${thirdPlaceTeam?.playerName}</div>
+                            <div style="font-size: 16px; font-weight: bold;">${third ? third.displayName : ''}</div>
+                            <div style="font-size: 12px; opacity: 0.8;">3rd Place</div>
                         </div>
                     </div>
-
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 20px;">📊 Tournament Statistics</h3>
                     
-                    <table style="width: 100%; color: white; border-collapse: collapse;">
-                        <tbody>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <td style="padding: 8px;">Total Matches Played</td>
-                                <td style="padding: 8px; text-align: right;"><strong>${totalMatches}</strong></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <td style="padding: 8px;">Total Points Scored</td>
-                                <td style="padding: 8px; text-align: right;"><strong>${totalPoints}</strong></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <td style="padding: 8px;">Most League Wins</td>
-                                <td style="padding: 8px; text-align: right;"><strong style="color: ${mostWins.color};">${mostWins.colorName}</strong> (${mostWins.wins})</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                <td style="padding: 8px;">Most League Points</td>
-                                <td style="padding: 8px; text-align: right;"><strong style="color: ${mostPoints.color};">${mostPoints.colorName}</strong> (${mostPoints.pointsFor})</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="text-align: center; margin-top: 30px;">
-                        <button class="minimize-btn" onclick="minimizeAllSections()" style="background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; color: white; border-radius: 6px; cursor: pointer;">
-                            ▲ Minimize All Sections
-                        </button>
-                        <button class="minimize-btn" onclick="downloadCSV()" style="background: #10B981; border: none; padding: 10px 20px; color: white; border-radius: 6px; cursor: pointer; margin-left: 10px;">
-                            📥 Download CSV
-                        </button>
-                    </div>
+                    <button class="minimize-btn" onclick="minimizeAllSections()">Minimize All</button>
+                    <button class="minimize-btn" style="background:#10B981; border:none; margin-left:10px;" onclick="downloadCSV()">CSV</button>
                 </div>
             `;
         }
+        
+        function minimizeAllSections() {
+            document.getElementById('matchesList').classList.add('hidden');
+            document.getElementById('semifinalContent').classList.add('hidden');
+            document.getElementById('setupContent').classList.add('hidden');
+            document.getElementById('tournamentSummaryCard').scrollIntoView({ behavior: 'smooth' });
+        }
 
         function downloadCSV() {
-            const leaderboard = getLeaderboardData();
-            const champion = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
-            const runnerUp = finalMatch.score1 > finalMatch.score2 ? finalMatch.team2 : finalMatch.team1;
-            const thirdPlace = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
+            const rows = [['Match Type', 'Team 1', 'Score 1', 'Score 2', 'Team 2', 'Winner']];
             
-            let csv = 'BADMINTON TOURNAMENT RESULTS\n\n';
-            
-            // Winners
-            csv += 'FINAL STANDINGS\n';
-            csv += 'Position,Team,Player Name\n';
-            csv += `Champion,${champion},${teams.find(t => t.colorName === champion)?.playerName}\n`;
-            csv += `Runner-Up,${runnerUp},${teams.find(t => t.colorName === runnerUp)?.playerName}\n`;
-            csv += `Third Place,${thirdPlace},${teams.find(t => t.colorName === thirdPlace)?.playerName}\n`;
-            csv += '\n';
-            
-            // Leaderboard
-            csv += 'LEAGUE STAGE STANDINGS\n';
-            csv += 'Rank,Team,Player Name,Matches Played,Wins,Losses,Points For,Points Against,Point Difference\n';
-            leaderboard.forEach((team, idx) => {
-                csv += `${idx + 1},${team.colorName},${team.playerName},${team.played},${team.wins},${team.losses},${team.pointsFor},${team.pointsAgainst},${team.pointDiff}\n`;
+            matches.forEach(m => {
+                const t1 = teams.find(t => t.id === m.team1Id);
+                const t2 = teams.find(t => t.id === m.team2Id);
+                const winner = m.score1 > m.score2 ? t1.displayName : t2.displayName;
+                rows.push(['League', t1.displayName, m.score1, m.score2, t2.displayName, winner]);
             });
-            csv += '\n';
-            
-            // All Matches
-            csv += 'ALL MATCHES\n';
-            csv += 'Match Type,Team 1,Player 1,Score 1,Team 2,Player 2,Score 2,Winner\n';
-            
-            // Round Robin
-            matches.forEach(match => {
-                const t1 = teams.find(t => t.colorName === match.team1);
-                const t2 = teams.find(t => t.colorName === match.team2);
-                const winner = match.score1 > match.score2 ? match.team1 : match.team2;
-                csv += `Round Robin,${match.team1},${t1?.playerName},${match.score1},${match.team2},${t2?.playerName},${match.score2},${winner}\n`;
-            });
-            
-            // Semifinals
-            if (semifinal1) {
-                const t1 = teams.find(t => t.colorName === semifinal1.team1);
-                const t2 = teams.find(t => t.colorName === semifinal1.team2);
-                const winner = semifinal1.score1 > semifinal1.score2 ? semifinal1.team1 : semifinal1.team2;
-                csv += `Semifinal 1,${semifinal1.team1},${t1?.playerName},${semifinal1.score1},${semifinal1.team2},${t2?.playerName},${semifinal1.score2},${winner}\n`;
+
+            if(semifinal1) {
+                const t1 = teams.find(t => t.id === semifinal1.team1Id);
+                const t2 = teams.find(t => t.id === semifinal1.team2Id);
+                const w = semifinal1.score1 > semifinal1.score2 ? t1.displayName : t2.displayName;
+                rows.push(['Semi 1', t1.displayName, semifinal1.score1, semifinal1.score2, t2.displayName, w]);
             }
-            
-            if (semifinal2) {
-                const t1 = teams.find(t => t.colorName === semifinal2.team1);
-                const t2 = teams.find(t => t.colorName === semifinal2.team2);
-                const winner = semifinal2.score1 > semifinal2.score2 ? semifinal2.team1 : semifinal2.team2;
-                csv += `Semifinal 2,${semifinal2.team1},${t1?.playerName},${semifinal2.score1},${semifinal2.team2},${t2?.playerName},${semifinal2.score2},${winner}\n`;
+             if(semifinal2) {
+                const t1 = teams.find(t => t.id === semifinal2.team1Id);
+                const t2 = teams.find(t => t.id === semifinal2.team2Id);
+                const w = semifinal2.score1 > semifinal2.score2 ? t1.displayName : t2.displayName;
+                rows.push(['Semi 2', t1.displayName, semifinal2.score1, semifinal2.score2, t2.displayName, w]);
             }
-            
-            // Third Place
-            if (thirdPlaceMatch) {
-                const t1 = teams.find(t => t.colorName === thirdPlaceMatch.team1);
-                const t2 = teams.find(t => t.colorName === thirdPlaceMatch.team2);
-                const winner = thirdPlaceMatch.score1 > thirdPlaceMatch.score2 ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
-                csv += `Third Place,${thirdPlaceMatch.team1},${t1?.playerName},${thirdPlaceMatch.score1},${thirdPlaceMatch.team2},${t2?.playerName},${thirdPlaceMatch.score2},${winner}\n`;
+             if(finalMatch) {
+                const t1 = teams.find(t => t.id === finalMatch.team1Id);
+                const t2 = teams.find(t => t.id === finalMatch.team2Id);
+                const w = finalMatch.score1 > finalMatch.score2 ? t1.displayName : t2.displayName;
+                rows.push(['Final', t1.displayName, finalMatch.score1, finalMatch.score2, t2.displayName, w]);
             }
-            
-            // Final
-            if (finalMatch) {
-                const t1 = teams.find(t => t.colorName === finalMatch.team1);
-                const t2 = teams.find(t => t.colorName === finalMatch.team2);
-                const winner = finalMatch.score1 > finalMatch.score2 ? finalMatch.team1 : finalMatch.team2;
-                csv += `Final,${finalMatch.team1},${t1?.playerName},${finalMatch.score1},${finalMatch.team2},${t2?.playerName},${finalMatch.score2},${winner}\n`;
-            }
-            
-            // Download
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            const date = new Date().toISOString().split('T')[0];
-            link.setAttribute('href', url);
-            link.setAttribute('download', `badminton_tournament_${date}.csv`);
-            link.style.visibility = 'hidden';
+
+            let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "tournament_results.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        function minimizeAllSections() {
-            // Minimize setup
-            if (setupComplete && !setupMinimized) {
-                document.getElementById('setupContent').classList.add('hidden');
-                document.getElementById('chevron').textContent = '▼';
-                setupMinimized = true;
+        function resetTournament() {
+            if(confirm("Reset everything?")) {
+                localStorage.clear();
+                location.reload();
             }
-
-            // Minimize playoff
-            if (!playoffMinimized) {
-                document.getElementById('semifinalContent').classList.add('hidden');
-                document.getElementById('playoffChevron').textContent = '▶';
-                playoffMinimized = true;
-            }
-
-            // Minimize completed matches
-            if (!completedMatchesMinimized) {
-                document.getElementById('matchesList').classList.add('hidden');
-                document.getElementById('completedChevron').textContent = '▶';
-                completedMatchesMinimized = true;
-            }
-
-            // Scroll to summary
-            document.getElementById('tournamentSummaryCard').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'center'
-            });
         }
 
-        function showError(id, message) {
-            const el = document.getElementById(id);
-            el.textContent = message;
-            el.classList.remove('hidden');
+        function showError(id, msg) {
+            document.getElementById(id).textContent = msg;
+            document.getElementById(id).classList.remove('hidden');
         }
-
         function hideError(id) {
             document.getElementById(id).classList.add('hidden');
         }
-
-        // Hide remaining matches when team selection changes
-        document.addEventListener('DOMContentLoaded', function() {
-            const remainingSelect = document.getElementById('remainingTeamSelect');
-            if (remainingSelect) {
-                remainingSelect.addEventListener('change', function() {
-                    document.getElementById('remainingMatchesBox').classList.add('hidden');
-                });
-            }
+        function toggleCompletedMatches() {
+            completedMatchesMinimized = !completedMatchesMinimized;
+            const content = document.getElementById('matchesList');
+            const chevron = document.getElementById('completedChevron');
+            if (completedMatchesMinimized) { content.classList.add('hidden'); chevron.textContent = '▶'; } 
+            else { content.classList.remove('hidden'); chevron.textContent = '▼'; }
+        }
+        function togglePlayoff() {
+            playoffMinimized = !playoffMinimized;
+            const content = document.getElementById('semifinalContent');
+            const chevron = document.getElementById('playoffChevron');
+            if (playoffMinimized) { content.classList.add('hidden'); chevron.textContent = '▶'; } 
+            else { content.classList.remove('hidden'); chevron.textContent = '▼'; }
+        }
+        
+        // Listener for team select logic in remaining matches
+        document.getElementById('remainingTeamSelect').addEventListener('change', () => {
+             document.getElementById('remainingMatchesBox').classList.add('hidden');
         });
     </script>
 </body>
